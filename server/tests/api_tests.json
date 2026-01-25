@@ -1,0 +1,16 @@
+{
+  "name": "NetPet API Tests",
+  "tests": [
+    {
+      "name": "Get Pet Status",
+      "method": "GET",
+      "url": "http://localhost:3000/api/pet/1"
+    },
+    {
+      "name": "Feed Pet",
+      "method": "PATCH",
+      "url": "http://localhost:3000/api/pet/1/interact",
+      "body": { "action": "feed" }
+    }
+  ]
+}
