@@ -1,25 +1,14 @@
 # NetPet : A Persistent Virtual Pet Application
 
+## Project Management
+You can follow the development and feature mapping on my Trello board:
+[NetPet Trello Board](https://trello.com/invite/b/6970d7bbd033142ae8d258f0/ATTIc5b0725900dc8db0f9c88df9d0843043B84EFD39/netpet)
+
 ## Description
-NetPet is a full-stack virtual pet game featuring a pixel-art aesthetic. Your pet lives on a server, and its status (hunger, sleep, happiness) decreases over time in real-time,even when you are logged out.
+NetPet is a full-stack PWA inspired by Tamagotchi, featuring custom pixel art created in Aseprite. Pets live on a server where hunger, energy, and happiness decay in real-time based on timestamps, even when the user is offline.
 
-## Feature Map
-### Phase 1: Minimum Viable Product (MVP)
-- [ ] **User Registration:** Create an account and name your pet (Create).
-- [ ] **Status Dashboard:** Visual bars for hunger, energy, and happiness.
-- [ ] **Interaction:** Buttons to feed and play with your pet (Modify).
-- [ ] **Persistent Storage:** Store data in PostgreSQL so the pet "remembers" its state.
-
-### Phase 2: Server Logic & Automation
-- [ ] **Time-based Calculation:** Backend logic that calculates hunger/status decay based on timestamps.
-- [ ] **Auto-save:** Automatic status updates and state persistence.
-
-### Phase 3: Social Features (Sharing)
-- [ ] **Search Functionality:** A search bar to find and view other players' pets by their username (Share).
-- [ ] **Gifting System:** After finding a friend's pet, users can send an "Energy Booster" as a gift (Share/Modify).
-
-## Technical Requirements
-- **Frontend:** HTML, CSS, JavaScript (Progressive Web App - PWA).
-- **Backend:** Node.js with Express (Rest'ish API).
-- **Database:** PostgreSQL for cloud-based storage.
-- **Functionality:** Offline support and user authentication.
+## Key Features
+* **Create:** Register an account, name your pet, and customize its appearance.
+* **Modify:** Interact by feeding, playing, or putting the pet to sleep to manage status bars and earn coins for items.
+* **Share:** Search for other users and send "Energy Boosters" as gifts to help maintain their pets' well-being.
+* **Technical:** Built with Node.js/Express and PostgreSQL for persistent cloud storage and real-time status calculations.
