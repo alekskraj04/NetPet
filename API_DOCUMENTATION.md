@@ -26,3 +26,9 @@ This document describes the scaffolded endpoints for the NetPet application.
 * **Endpoint:** `POST /api/pets`
 * **Body:** `{ "petName": "string", "appearance": "type" }`
 * **Description:** Creates a new pet instance for the player.
+
+
+
+## Middleware: Status Decay (`petStatus.js`)
+**Need:** To calculate hunger and energy loss based on the time elapsed since the last interaction.
+**Functionality:** It intercepts requests to pet-related routes, calculates the time difference, and attaches a `decayStats` object to the request for use in the response.
