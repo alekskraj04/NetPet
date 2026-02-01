@@ -1,1 +1,45 @@
-<h1>NetPet</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetPet - Registration</title>
+</head>
+<body>
+    <h1>NetPet</h1>
+
+    <section id="registration">
+        <h2>Create Account</h2>
+        <form id="userForm">
+            <div>
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <br>
+            <div>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <br>
+            <div>
+                <input type="checkbox" id="consent" name="consentToToS" required>
+                <label for="consent">
+                    I have read and accept the 
+                    <a href="../TOS.md">Terms of Service</a> and 
+                    <a href="../PRIVACY.md">Privacy Policy</a>.
+                </label>
+            </div>
+            <br>
+            <button type="submit">Create Account</button>
+        </form>
+    </section>
+
+    <hr>
+
+    <section id="delete-account">
+        <h2>Manage Account</h2>
+        <p>Want to retract your consent? Delete your account here:</p>
+        <button onclick="alert('This would call DELETE /api/users/:username')">Delete My Account</button>
+    </section>
+</body>
+</html>
