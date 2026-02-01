@@ -32,3 +32,18 @@ This document describes the scaffolded endpoints for the NetPet application.
 ## Middleware: Status Decay (`petStatus.js`)
 **Need:** To calculate hunger and energy loss based on the time elapsed since the last interaction.
 **Functionality:** It intercepts requests to pet-related routes, calculates the time difference, and attaches a `decayStats` object to the request for use in the response.
+
+---
+
+## User Management (Added Feb 2026)
+
+### 6. Create User
+* **Endpoint:** `POST /api/users`
+* **Body:** `{ "username": "string", "email": "string", "consentToToS": boolean }`
+* **Description:** Creates a new user. Requires `consentToToS` to be true.
+* **Requirement:** Data minimization (GDPR).
+
+### 7. Delete User (Retract Consent)
+* **Endpoint:** `DELETE /api/users/:username`
+* **Description:** Deletes the user account and all associated personal data.
+* **Requirement:** Right to be forgotten.

@@ -38,3 +38,40 @@ app.post('/api/pets', (req, res) => {
 
 const PORT = 3000;
 app.listen(PORT, () => console.log(`NetPet API running on port ${PORT}`));
+
+
+
+// --- USER API (New for "Users and more" assignment) ---
+
+// 1. Create User Account
+// Requirement: Must actively consent to ToS/Privacy Policy
+app.post('/api/users', (req, res) => {
+    const { username, email, consentToToS } = req.body;
+
+    if (!consentToToS) {
+        return res.status(400).json({ 
+            message: "Du må akseptere Terms of Service for å opprette en konto." 
+        });
+    }
+
+    // Her ville vi vanligvis lagret i en database, men oppgaven sier "Do not make a database"
+    console.log(`Bruker opprettet: ${username} (${email})`);
+    
+    res.status(201).json({
+        message: "Bruker opprettet suksessfullt!",
+        user: { username, email, consentDate: new Date().toISOString() }
+    });
+});
+
+// 2. Delete Account (Right to be forgotten)
+// Requirement: Potential users can retract consent and delete account
+app.delete('/api/users/:username', (req, res) => {
+    const username = req.params.username;
+
+    // Her simulerer vi sletting av all personlig data (GDPR-prinsippet)
+    console.log(`Sletter all data for bruker: ${username}`);
+
+    res.json({ 
+        message: `Kontoen til ${username} og all tilhørende data er slettet.` 
+    });
+});
