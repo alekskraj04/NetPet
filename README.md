@@ -13,3 +13,13 @@ NetPet is a full-stack PWA inspired by Tamagotchi, featuring custom pixel art cr
 * **Share:** Search for other users and send "Energy Boosters" as gifts to help maintain their pets' well-being.
 * **Technical:** Built with Node.js/Express and PostgreSQL for persistent cloud storage and real-time status calculations.
 #https://trello.com/invite/b/6970d7bbd033142ae8d258f0/ATTIc5b0725900dc8db0f9c88df9d0843043B84EFD39/netpet
+
+
+
+
+
+
+
+## Legal & Privacy
+* [Privacy Policy](./PRIVACY.md)
+* [Terms of Service](./TOS.md)
