@@ -4,11 +4,12 @@ class UserManager extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
-        this.users = []; // Local storage of data to avoid duplication
+        // We use this array to simulate a database since we don't have a server yet
+        this.users = []; 
     }
 
     async connectedCallback() {
-        // Use relative URL to fetch the UI template
+        // Load the UI template using a relative URL
         const response = await fetch('./views/UserView.html');
         this.shadowRoot.innerHTML = await response.text();
         this.setupEventListeners();
@@ -18,59 +19,61 @@ class UserManager extends HTMLElement {
         this.shadowRoot.querySelector('#create-btn').onclick = () => this.createUser();
     }
 
-    // 1. CREATE USER
+    // 1. CREATE USER (Simulated)
     async createUser() {
-        const username = this.shadowRoot.querySelector('#username').value;
-        const email = this.shadowRoot.querySelector('#email').value;
+        const usernameInput = this.shadowRoot.querySelector('#username');
+        const emailInput = this.shadowRoot.querySelector('#email');
+
+        if (!usernameInput.value || !emailInput.value) return alert("Please fill in all fields");
+
+        const newUser = { 
+            username: usernameInput.value, 
+            email: emailInput.value 
+        };
+
+        // Here we simulate the API call. 
+        // In a real app, we would wait for: await request('/api/users', 'POST', newUser);
+        console.log("Simulating API POST request to /api/users...", newUser);
         
-        // Complies with the "single fetch call" rule via the request module
-        try {
-            const result = await request('/api/users', 'POST', { username, email, consentToToS: true });
-            console.log("User created:", result);
-            this.renderUserList(username, email); 
-        } catch (error) {
-            console.error("Could not create user:", error);
-        }
+        this.users.push(newUser);
+        this.renderUserList(newUser.username, newUser.email);
+
+        // Clear inputs
+        usernameInput.value = '';
+        emailInput.value = '';
     }
 
-    // 2. DELETE USER
+    // 2. DELETE USER (Simulated)
     async deleteUser(username) {
-        try {
-            await request(`/api/users/${username}`, 'DELETE');
-            alert(`User ${username} deleted`);
-            // Update UI by removing the element
-            this.shadowRoot.querySelector(`#user-${username}`).remove();
-        } catch (error) {
-            console.error("Deletion failed:", error);
-        }
+        // Simulate: await request(`/api/users/${username}`, 'DELETE');
+        console.log(`Simulating API DELETE request for: ${username}`);
+        
+        this.users = this.users.filter(u => u.username !== username);
+        this.shadowRoot.querySelector(`#user-${username}`).remove();
+        alert(`User ${username} deleted from local memory`);
     }
 
-    // 3. EDIT USER 
+    // 3. EDIT USER (Simulated)
     async editUser(username) {
         const newEmail = prompt(`Update email for ${username}:`);
         
         if (newEmail) {
-            try {
-                // Send a PUT request via fetchManager
-                const result = await request(`/api/users/${username}`, 'PUT', { email: newEmail });
-                alert("User updated!");
-                console.log("Update success:", result);
-                
-                // Update the email display in the UI
-                this.shadowRoot.querySelector(`#email-${username}`).textContent = newEmail;
-            } catch (error) {
-                console.error("Editing failed:", error);
-            }
+            // Simulate: await request(`/api/users/${username}`, 'PUT', { email: newEmail });
+            console.log(`Simulating API PUT request for: ${username}`);
+            
+            const user = this.users.find(u => u.username === username);
+            if (user) user.email = newEmail;
+
+            this.shadowRoot.querySelector(`#email-${username}`).textContent = newEmail;
         }
     }
 
     renderUserList(username, email) {
         const list = this.shadowRoot.querySelector('#user-list');
-        // Add a unique ID per user row for easy deletion/editing
         list.innerHTML += `
-            <div class="user-item" id="user-${username}" style="margin-top: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
+            <div class="user-item" id="user-${username}" style="margin-top: 10px; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
                 <span><strong>${username}</strong> (<span id="email-${username}">${email}</span>)</span>
-                <div>
+                <div style="margin-top: 5px;">
                     <button onclick="this.getRootNode().host.editUser('${username}')">Edit</button>
                     <button onclick="this.getRootNode().host.deleteUser('${username}')" style="color: red;">Delete</button>
                 </div>

@@ -1,4 +1,4 @@
-// Centralized fetch manager to comply with the "single fetch call" rule
+
 async function request(url, method = 'GET', body = null) {
     const options = {
         method,
