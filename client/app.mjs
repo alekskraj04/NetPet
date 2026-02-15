@@ -4,11 +4,11 @@ class UserManager extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
-        this.users = []; // Lokal lagring av data for å unngå duplisering
+        this.users = []; // Local storage of data to avoid duplication
     }
 
     async connectedCallback() {
-        // Bruker relativ URL for å hente UI-malen
+        // Use relative URL to fetch the UI template
         const response = await fetch('./views/UserView.html');
         this.shadowRoot.innerHTML = await response.text();
         this.setupEventListeners();
@@ -23,13 +23,13 @@ class UserManager extends HTMLElement {
         const username = this.shadowRoot.querySelector('#username').value;
         const email = this.shadowRoot.querySelector('#email').value;
         
-        // Overholder "single fetch call"-regelen via request-modulen
+        // Complies with the "single fetch call" rule via the request module
         try {
             const result = await request('/api/users', 'POST', { username, email, consentToToS: true });
             console.log("User created:", result);
             this.renderUserList(username, email); 
         } catch (error) {
-            console.error("Kunne ikke opprette bruker:", error);
+            console.error("Could not create user:", error);
         }
     }
 
@@ -38,35 +38,35 @@ class UserManager extends HTMLElement {
         try {
             await request(`/api/users/${username}`, 'DELETE');
             alert(`User ${username} deleted`);
-            // Oppdaterer UI ved å fjerne elementet
+            // Update UI by removing the element
             this.shadowRoot.querySelector(`#user-${username}`).remove();
         } catch (error) {
-            console.error("Sletting feilet:", error);
+            console.error("Deletion failed:", error);
         }
     }
 
-    // 3. EDIT USER (Dette er det nye punktet du trengte!)
+    // 3. EDIT USER 
     async editUser(username) {
-        const newEmail = prompt(`Oppdater e-post for ${username}:`);
+        const newEmail = prompt(`Update email for ${username}:`);
         
         if (newEmail) {
             try {
-                // Sender en PUT-forespørsel via fetchManager
+                // Send a PUT request via fetchManager
                 const result = await request(`/api/users/${username}`, 'PUT', { email: newEmail });
-                alert("Bruker oppdatert!");
+                alert("User updated!");
                 console.log("Update success:", result);
                 
-                // Oppdaterer e-postvisningen i UI-en
+                // Update the email display in the UI
                 this.shadowRoot.querySelector(`#email-${username}`).textContent = newEmail;
             } catch (error) {
-                console.error("Redigering feilet:", error);
+                console.error("Editing failed:", error);
             }
         }
     }
 
     renderUserList(username, email) {
         const list = this.shadowRoot.querySelector('#user-list');
-        // Legger til en unik ID per bruker-rad så vi enkelt kan slette/redigere
+        // Add a unique ID per user row for easy deletion/editing
         list.innerHTML += `
             <div class="user-item" id="user-${username}" style="margin-top: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
                 <span><strong>${username}</strong> (<span id="email-${username}">${email}</span>)</span>
