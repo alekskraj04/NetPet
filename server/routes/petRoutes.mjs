@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
 
-// I .mjs må vi bruke 'import' og inkludere hele filnavnet med .mjs
+
 import calculateDecay from '../middleware/petStatus.mjs'; 
 
 // 1. GET: Fetch pet status

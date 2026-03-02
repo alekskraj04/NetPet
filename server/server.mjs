@@ -20,7 +20,7 @@ app.use(express.static(path.join(__dirname, '../client')));
 app.use('/api/users', userRoutes);
 app.use('/api/pets', petRoutes);
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Initialize database before starting the server
 initializeDatabase().then(() => {

@@ -4,12 +4,12 @@
     {
       "name": "Get Pet Status",
       "method": "GET",
-      "url": "http://localhost:3000/api/pet/1"
+      "url": "https://netpet.onrender.com/api/pet/1"
     },
     {
       "name": "Feed Pet",
       "method": "PATCH",
-      "url": "http://localhost:3000/api/pet/1/interact",
+      "url": "https://netpet.onrender.com/api/pet/1/interact",
       "body": { "action": "feed" }
     }
   ]

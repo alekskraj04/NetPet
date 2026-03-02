@@ -1,4 +1,4 @@
-POST http://localhost:3000/api/users
+POST https://netpet.onrender.com/api/users
 Content-Type: application/json
 
 {
