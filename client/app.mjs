@@ -9,7 +9,7 @@ class UserManager extends HTMLElement {
 
     async connectedCallback() {
         try {
-            // Start by loading the registration form (UserView)
+            // Starter med å laste registreringsskjemaet
             const response = await fetch('./views/UserView.html');
             this.shadowRoot.innerHTML = await response.text();
             this.setupEventListeners();
@@ -25,30 +25,32 @@ class UserManager extends HTMLElement {
         }
     }
 
-    // UPDATED FUNCTION: Now hides index.html elements for a "new page" feel
+    // FUNKSJON SOM RYDDER SIDEN OG VISER SPILLET
     async showGameView(username) {
         try {
-            // 1. Hide the main header and the initial GIF in index.html
+            // 1. Skjul elementer i index.html (viktig å bruke 'important' for å tvinge frem endringen)
             const mainHeader = document.querySelector('h1');
-            const initialGif = document.querySelector('img');
-            
-            if (mainHeader) mainHeader.style.display = 'none';
-            if (initialGif) initialGif.style.display = 'none';
+            const initialGif = document.querySelector('body > img'); // Treffer gifen i body
+            const footer = document.querySelector('footer');
 
-            // 2. Fetch the GAMEVIEW.html file
+            if (mainHeader) mainHeader.style.setProperty('display', 'none', 'important');
+            if (initialGif) initialGif.style.setProperty('display', 'none', 'important');
+            if (footer) footer.style.setProperty('display', 'none', 'important');
+
+            // 2. Hent spillets HTML
             const response = await fetch('./views/GAMEVIEW.html');
             const html = await response.text();
             
-            // 3. Replace the entire content of shadowRoot with the GameView code
+            // 3. Bytt ut innholdet i shadowRoot
             this.shadowRoot.innerHTML = html;
             
-            // 4. Dynamically update the pet's name in the game
+            // 4. Oppdater navnet i spillet
             const petTitle = this.shadowRoot.querySelector('#pet-name');
             if (petTitle) {
                 petTitle.innerText = `${username}'s NetPet`;
             }
             
-            console.log(`Switched to clean game view for: ${username}`);
+            console.log(`Clean game view loaded for: ${username}`);
         } catch (error) {
             console.error("Error loading GAMEVIEW:", error);
         }
@@ -68,39 +70,24 @@ class UserManager extends HTMLElement {
         };
 
         try {
-            // Send data to your Render server
             const response = await request('/api/users', 'POST', newUser);
-            console.log("User successfully saved to PostgreSQL on Render!", response);
+            console.log("User saved to Render!", response);
             
-            // Jump straight to the clean game view!
+            // Bytt visning umiddelbart
             this.showGameView(newUser.username);
-
         } catch (error) {
             console.error("Error saving to database:", error);
-            alert("Could not save user to the database.");
+            alert("Could not save user.");
         }
     }
 
+    // Admin-funksjoner (valgfritt å beholde)
     async deleteUser(username) {
         if (!confirm(`Are you sure you want to delete ${username}?`)) return;
         try {
             await request(`/api/users/${username}`, 'DELETE');
-            const userElement = this.shadowRoot.querySelector(`#user-${username}`);
-            if (userElement) userElement.remove();
         } catch (error) {
             console.error("Could not delete user:", error);
-        }
-    }
-
-    async editUser(username) {
-        const newEmail = prompt(`Update email for ${username}:`);
-        if (newEmail) {
-            try {
-                await request(`/api/users/${username}`, 'PUT', { email: newEmail });
-                this.shadowRoot.querySelector(`#email-${username}`).textContent = newEmail;
-            } catch (error) {
-                console.error("Could not update user:", error);
-            }
         }
     }
 }
