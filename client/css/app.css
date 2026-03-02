@@ -1,14 +1,61 @@
+/* Importerer Pixelify Sans direkte i CSS-en som en sikkerhet */
+@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');
+
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #dcf4f7; /* Litt NetPet-farge */
+    font-family: 'Pixelify Sans', sans-serif;
+    background-color: #dcf4f7; /* NetPet lyseblå */
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
 }
 
-h1 { color: #9a67a6; }
+/* Den massive Pixel-headeren */
+h1 { 
+    color: #9a67a6; 
+    font-size: 5rem; /* Kjempestor */
+    margin-top: 40px;
+    margin-bottom: 20px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    /* En "blocky" skygge som passer pixel-stilen */
+    text-shadow: 5px 5px 0px rgba(0, 0, 0, 0.1); 
+}
 
+/* Beholder bredden på komponenten din */
 user-manager {
     width: 80%;
     max-width: 600px;
+}
+
+/* Tvinger alle knapper og felt til å bruke den kule fonten */
+button, input, select, textarea {
+    font-family: 'Pixelify Sans', sans-serif;
+    font-size: 1.2rem;
+}
+
+/* En liten bonus: gjør knappen litt mer "gamey" */
+button {
+    background-color: #9a67a6;
+    color: white;
+    border: 4px solid #7a4d86;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+button:hover {
+    transform: scale(1.05);
+    background-color: #b380c2;
+}
+
+/* Footer-stil */
+footer {
+    margin-top: 50px;
+    text-align: center;
+    font-size: 0.9rem;
+    opacity: 0.8;
 }
