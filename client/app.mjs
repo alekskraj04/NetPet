@@ -25,23 +25,30 @@ class UserManager extends HTMLElement {
         }
     }
 
-    // NEW FUNCTION: Switches the content to the actual game
+    // UPDATED FUNCTION: Now hides index.html elements for a "new page" feel
     async showGameView(username) {
         try {
-            // Fetching the GAMEVIEW.html file
+            // 1. Hide the main header and the initial GIF in index.html
+            const mainHeader = document.querySelector('h1');
+            const initialGif = document.querySelector('img');
+            
+            if (mainHeader) mainHeader.style.display = 'none';
+            if (initialGif) initialGif.style.display = 'none';
+
+            // 2. Fetch the GAMEVIEW.html file
             const response = await fetch('./views/GAMEVIEW.html');
             const html = await response.text();
             
-            // Replacing the entire content of shadowRoot with the GameView code
+            // 3. Replace the entire content of shadowRoot with the GameView code
             this.shadowRoot.innerHTML = html;
             
-            // Dynamically update the pet's name in the game
+            // 4. Dynamically update the pet's name in the game
             const petTitle = this.shadowRoot.querySelector('#pet-name');
             if (petTitle) {
                 petTitle.innerText = `${username}'s NetPet`;
             }
             
-            console.log(`Switched to game mode for: ${username}`);
+            console.log(`Switched to clean game view for: ${username}`);
         } catch (error) {
             console.error("Error loading GAMEVIEW:", error);
         }
@@ -65,7 +72,7 @@ class UserManager extends HTMLElement {
             const response = await request('/api/users', 'POST', newUser);
             console.log("User successfully saved to PostgreSQL on Render!", response);
             
-            // Instead of just adding to a list, we jump straight to the game!
+            // Jump straight to the clean game view!
             this.showGameView(newUser.username);
 
         } catch (error) {
@@ -74,7 +81,6 @@ class UserManager extends HTMLElement {
         }
     }
 
-    // Keep these functions for potential future admin features
     async deleteUser(username) {
         if (!confirm(`Are you sure you want to delete ${username}?`)) return;
         try {
