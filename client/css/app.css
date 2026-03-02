@@ -14,7 +14,7 @@ body {
 
 /* Den massive Pixel-headeren */
 h1 { 
-    color: #9a67a6; 
+    color: #caa3d3; 
     font-size: 5rem; /* Kjempestor */
     margin-top: 40px;
     margin-bottom: 20px;
@@ -49,7 +49,7 @@ button {
 
 button:hover {
     transform: scale(1.05);
-    background-color: #b380c2;
+    background-color: #ecc0fa;
 }
 
 /* Footer-stil */
