@@ -13,12 +13,21 @@ const app = express();
 // Middleware
 app.use(express.json());
 
-// Serve static files from the client folder
+// 1. VIKTIG: Gjør assets-mappen tilgjengelig for nettleseren
+// Dette gjør at <img src="/assets/..."> fungerer på Render
+app.use('/assets', express.static(path.join(__dirname, '../assets')));
+
+// 2. Serve statiske filer fra client-mappen (css, js, views)
 app.use(express.static(path.join(__dirname, '../client')));
 
 // API Routes
 app.use('/api/users', userRoutes);
 app.use('/api/pets', petRoutes);
+
+// Enkel rute for å servere index.html som hovedside
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/index.html'));
+});
 
 const PORT = process.env.PORT || 3000;
 
