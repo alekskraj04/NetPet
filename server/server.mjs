@@ -1,10 +1,10 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { initializeDatabase } from './db.mjs'; 
 import userRoutes from './routes/userRoutes.mjs';
 import petRoutes from './routes/petRoutes.mjs';
 
-// Disse to linjene er nødvendige i .mjs for at path.join(__dirname) skal fungere
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -16,12 +16,17 @@ app.use(express.json());
 // Serve static files from the client folder
 app.use(express.static(path.join(__dirname, '../client')));
 
-// Routes
+// API Routes
 app.use('/api/users', userRoutes);
 app.use('/api/pets', petRoutes);
 
-// Start server
 const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`NetPet API running on http://localhost:${PORT}`);
+
+// Initialize database before starting the server
+initializeDatabase().then(() => {
+    app.listen(PORT, () => {
+        console.log(`NetPet API running on http://localhost:${PORT}`);
+    });
+}).catch(err => {
+    console.error("Failed to start server due to database error:", err);
 });
