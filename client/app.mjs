@@ -93,3 +93,12 @@ class UserManager extends HTMLElement {
 }
 
 customElements.define('user-manager', UserManager);
+
+// --- STEG 4: REGISTRERING AV SERVICE WORKER FOR PWA ---
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('Service Worker registrert og klar!', reg))
+        .catch(err => console.error('Service Worker registrering feilet:', err));
+    });
+}
