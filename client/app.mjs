@@ -16,7 +16,6 @@ const translations = {
     }
 };
 
-// Determine user language (defaults to English if not Norwegian)
 const lang = navigator.language.startsWith('nb') || navigator.language.startsWith('no') ? 'no' : 'en';
 const t = translations[lang];
 
@@ -29,7 +28,6 @@ class UserManager extends HTMLElement {
 
     async connectedCallback() {
         try {
-            // Start by loading the registration form
             const response = await fetch('./views/UserView.html');
             this.shadowRoot.innerHTML = await response.text();
             this.setupEventListeners();
@@ -45,26 +43,23 @@ class UserManager extends HTMLElement {
         }
     }
 
-    // Function that clears the page and displays the game
     async showGameView(username) {
         try {
-            // 1. Hide elements in index.html (using !important to force the change)
+            // Target elements in index.html to prevent duplicate visuals
             const mainHeader = document.querySelector('h1');
-            const initialGif = document.querySelector('body > img');
+            const initialGif = document.querySelector('body > img'); 
             const footer = document.querySelector('footer');
 
-            if (mainHeader) mainHeader.style.setProperty('display', 'none', 'important');
-            if (initialGif) initialGif.style.setProperty('display', 'none', 'important');
-            if (footer) footer.style.setProperty('display', 'none', 'important');
+            // Removing elements instead of hiding them to fix the "double gif" issue
+            if (mainHeader) mainHeader.remove();
+            if (initialGif) initialGif.remove(); 
+            if (footer) footer.remove();
 
-            // 2. Fetch the game HTML
             const response = await fetch('./views/GAMEVIEW.html');
             const html = await response.text();
             
-            // 3. Replace content in shadowRoot
             this.shadowRoot.innerHTML = html;
             
-            // 4. Update the pet name in the game
             const petTitle = this.shadowRoot.querySelector('#pet-name');
             if (petTitle) {
                 petTitle.innerText = `${username}'s NetPet`;
@@ -80,7 +75,6 @@ class UserManager extends HTMLElement {
         const usernameInput = this.shadowRoot.querySelector('#username');
         const emailInput = this.shadowRoot.querySelector('#email');
 
-        // Use translation instead of hardcoded strings (prevents Magic Strings)
         if (!usernameInput.value || !emailInput.value) {
             return alert(t.fillFields);
         }
@@ -93,8 +87,6 @@ class UserManager extends HTMLElement {
         try {
             const response = await request('/api/users', 'POST', newUser);
             console.log(t.userSaved, response);
-            
-            // Switch view immediately
             this.showGameView(newUser.username);
         } catch (error) {
             console.error(t.saveError, error);
@@ -102,9 +94,7 @@ class UserManager extends HTMLElement {
         }
     }
 
-    // Admin functions (optional to keep)
     async deleteUser(username) {
-        // Use translation for confirmation
         if (!confirm(`${t.confirmDelete}${username}?`)) return;
         try {
             await request(`/api/users/${username}`, 'DELETE');
@@ -116,7 +106,6 @@ class UserManager extends HTMLElement {
 
 customElements.define('user-manager', UserManager);
 
-// --- PWA: SERVICE WORKER REGISTRATION ---
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./sw.js')
