@@ -1,12 +1,13 @@
 const CACHE_NAME = 'netpet-v1';
 const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/css/app.css',
-  '/app.mjs',
-  '/assets/favicon.png',
-  '/views/UserView.html',
-  '/views/GAMEVIEW.html'
+  './',
+  './index.html',
+  './css/app.css',
+  './app.mjs',
+  './assets/favicon.png',
+  './assets/icon-192.png', 
+  './views/UserView.html',
+  './views/GAMEVIEW.html'
 ];
 
 // Installerer Service Worker og lagrer filer i cache
