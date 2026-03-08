@@ -1,27 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="no">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#D1E8FF">
     <title>NetPet Client</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/png" href="./assets/logo.png">
+    
+    <link rel="icon" type="image/png" href="./assets/favicon.png">
+    <link rel="apple-touch-icon" href="./assets/icon-192.png">
     <link rel="manifest" href="./manifest.json">
+    
     <link rel="stylesheet" href="./css/app.css">
 </head>
 <body>
-    <h1>NetPet User Creation</h1>
-    
-    <img src="/assets/creatureidle.gif" alt="Tamagotchi" style="width: 150px; height: auto; display: block; margin: 20px auto;">
 
-    <user-manager></user-manager>
+    <main>
+        <h1>NetPet User Creation</h1>
+        
+        <img src="./assets/creatureidle.gif" alt="En søt pixel-art skapning som puster rolig" style="width: 150px; height: auto; display: block; margin: 20px auto;">
+
+        <user-manager></user-manager>
+    </main>
 
     <footer>
         <hr>
-        <nav>
+        <nav aria-label="Juridisk informasjon">
             <a href="tos.html">Terms of Service</a> | 
             <a href="privacy.html">Privacy Policy</a>
         </nav>
