@@ -1,5 +1,25 @@
 import request from './modules/fetchManager.mjs';
 
+// --- I18n & L10n (Language Handling) ---
+const translations = {
+    no: {
+        fillFields: "Vennligst fyll ut alle felt",
+        userSaved: "Bruker lagret på Render!",
+        saveError: "Kunne ikke lagre bruker til databasen.",
+        confirmDelete: "Er du sikker på at du vil slette "
+    },
+    en: {
+        fillFields: "Please fill in all fields",
+        userSaved: "User saved to Render!",
+        saveError: "Could not save user to the database.",
+        confirmDelete: "Are you sure you want to delete "
+    }
+};
+
+// Determine user language (defaults to English if not Norwegian)
+const lang = navigator.language.startsWith('nb') || navigator.language.startsWith('no') ? 'no' : 'en';
+const t = translations[lang];
+
 class UserManager extends HTMLElement {
     constructor() {
         super();
@@ -9,7 +29,7 @@ class UserManager extends HTMLElement {
 
     async connectedCallback() {
         try {
-            // Starter med å laste registreringsskjemaet
+            // Start by loading the registration form
             const response = await fetch('./views/UserView.html');
             this.shadowRoot.innerHTML = await response.text();
             this.setupEventListeners();
@@ -25,26 +45,26 @@ class UserManager extends HTMLElement {
         }
     }
 
-    // FUNKSJON SOM RYDDER SIDEN OG VISER SPILLET
+    // Function that clears the page and displays the game
     async showGameView(username) {
         try {
-            // 1. Skjul elementer i index.html (viktig å bruke 'important' for å tvinge frem endringen)
+            // 1. Hide elements in index.html (using !important to force the change)
             const mainHeader = document.querySelector('h1');
-            const initialGif = document.querySelector('body > img'); // Treffer gifen i body
+            const initialGif = document.querySelector('body > img');
             const footer = document.querySelector('footer');
 
             if (mainHeader) mainHeader.style.setProperty('display', 'none', 'important');
             if (initialGif) initialGif.style.setProperty('display', 'none', 'important');
             if (footer) footer.style.setProperty('display', 'none', 'important');
 
-            // 2. Hent spillets HTML
+            // 2. Fetch the game HTML
             const response = await fetch('./views/GAMEVIEW.html');
             const html = await response.text();
             
-            // 3. Bytt ut innholdet i shadowRoot
+            // 3. Replace content in shadowRoot
             this.shadowRoot.innerHTML = html;
             
-            // 4. Oppdater navnet i spillet
+            // 4. Update the pet name in the game
             const petTitle = this.shadowRoot.querySelector('#pet-name');
             if (petTitle) {
                 petTitle.innerText = `${username}'s NetPet`;
@@ -60,8 +80,9 @@ class UserManager extends HTMLElement {
         const usernameInput = this.shadowRoot.querySelector('#username');
         const emailInput = this.shadowRoot.querySelector('#email');
 
+        // Use translation instead of hardcoded strings (prevents Magic Strings)
         if (!usernameInput.value || !emailInput.value) {
-            return alert("Please fill in all fields");
+            return alert(t.fillFields);
         }
 
         const newUser = { 
@@ -71,19 +92,20 @@ class UserManager extends HTMLElement {
 
         try {
             const response = await request('/api/users', 'POST', newUser);
-            console.log("User saved to Render!", response);
+            console.log(t.userSaved, response);
             
-            // Bytt visning umiddelbart
+            // Switch view immediately
             this.showGameView(newUser.username);
         } catch (error) {
-            console.error("Error saving to database:", error);
-            alert("Could not save user.");
+            console.error(t.saveError, error);
+            alert(t.saveError);
         }
     }
 
-    // Admin-funksjoner (valgfritt å beholde)
+    // Admin functions (optional to keep)
     async deleteUser(username) {
-        if (!confirm(`Are you sure you want to delete ${username}?`)) return;
+        // Use translation for confirmation
+        if (!confirm(`${t.confirmDelete}${username}?`)) return;
         try {
             await request(`/api/users/${username}`, 'DELETE');
         } catch (error) {
@@ -94,11 +116,11 @@ class UserManager extends HTMLElement {
 
 customElements.define('user-manager', UserManager);
 
-// --- STEG 4: REGISTRERING AV SERVICE WORKER FOR PWA ---
+// --- PWA: SERVICE WORKER REGISTRATION ---
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('Service Worker registrert og klar!', reg))
-        .catch(err => console.error('Service Worker registrering feilet:', err));
+        .then(reg => console.log('Service Worker registered!', reg))
+        .catch(err => console.error('Service Worker registration failed:', err));
     });
 }
