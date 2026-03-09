@@ -27,18 +27,15 @@ class UserManager extends HTMLElement {
     }
 
     async connectedCallback() {
-        // --- NYTT: HUSK BRUKER ---
-        // Sjekker om det finnes et lagret brukernavn i nettleseren
+      
         const savedUser = localStorage.getItem('netpet_user');
 
         if (savedUser) {
             console.log(`Welcome back, ${savedUser}!`);
-            // Hopper rett til spillet hvis vi kjenner brukeren
             return this.showGameView(savedUser);
         }
 
         try {
-            // Hvis ingen bruker er lagret, vis registreringsskjemaet
             const response = await fetch('./views/UserView.html');
             this.shadowRoot.innerHTML = await response.text();
             this.setupEventListeners();
@@ -48,10 +45,31 @@ class UserManager extends HTMLElement {
     }
 
     setupEventListeners() {
+        
         const createBtn = this.shadowRoot.querySelector('#create-btn');
         if (createBtn) {
             createBtn.onclick = () => this.createUser();
         }
+
+        
+        const loginBtn = this.shadowRoot.querySelector('#login-btn');
+        if (loginBtn) {
+            loginBtn.onclick = () => this.loginUser();
+        }
+    }
+
+    
+    async loginUser() {
+        const usernameInput = this.shadowRoot.querySelector('#login-username');
+        const username = usernameInput ? usernameInput.value.trim() : null;
+
+        if (!username) {
+            return alert(t.fillFields);
+        }
+
+       
+        localStorage.setItem('netpet_user', username);
+        this.showGameView(username);
     }
 
     async showGameView(username) {
@@ -71,7 +89,7 @@ class UserManager extends HTMLElement {
             
             const petTitle = this.shadowRoot.querySelector('#pet-name');
             if (petTitle) {
-                petTitle.innerText = `${username}'s NetPet`;
+                petTitle.innerText = `${username.toUpperCase()}'S PET`;
             }
             
             console.log(`Stable game view loaded for: ${username}`);
@@ -97,10 +115,7 @@ class UserManager extends HTMLElement {
             const response = await request('/api/users', 'POST', newUser);
             console.log(t.userSaved, response);
             
-            // --- NYTT: LAGRE BRUKER ---
-            // Lagrer brukernavnet lokalt slik at man slipper å lage ny hver gang
             localStorage.setItem('netpet_user', newUser.username);
-            
             this.showGameView(newUser.username);
         } catch (error) {
             console.error(t.saveError, error);
@@ -112,8 +127,8 @@ class UserManager extends HTMLElement {
         if (!confirm(`${t.confirmDelete}${username}?`)) return;
         try {
             await request(`/api/users/${username}`, 'DELETE');
-            // Hvis man sletter brukeren, bør vi også fjerne dem fra LocalStorage
             localStorage.removeItem('netpet_user');
+            window.location.reload(); 
         } catch (error) {
             console.error("Could not delete user:", error);
         }

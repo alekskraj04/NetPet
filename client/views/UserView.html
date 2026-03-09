@@ -1,17 +1,78 @@
 <style>
-    .user-manager { border: 2px solid #444; padding: 20px; border-radius: 10px; background: #f9f9f9; }
-    .input-group { margin-bottom: 10px; }
-    .user-item { display: flex; justify-content: space-between; padding: 5px; border-bottom: 1px solid #ddd; }
+    .user-manager { 
+        border: 2px solid #444; 
+        padding: 20px; 
+        border-radius: 10px; 
+        background: #f9f9f9; 
+        max-width: 400px;
+        margin: 0 auto;
+        font-family: sans-serif;
+    }
+    .section {
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+    }
+    .divider {
+        border-top: 1px dashed #ccc;
+        margin: 20px 0;
+        position: relative;
+    }
+    .divider span {
+        position: absolute;
+        top: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #f9f9f9;
+        padding: 0 10px;
+        color: #777;
+        font-size: 0.9em;
+    }
+    .input-group { 
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    input {
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+    button {
+        padding: 10px;
+        cursor: pointer;
+        background-color: #00acc1;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-weight: bold;
+    }
+    button:hover {
+        background-color: #00838f;
+    }
+    #login-btn {
+        background-color: #4caf50;
+    }
 </style>
 
 <div class="user-manager">
-    <h2>User Management</h2>
-    <div class="input-group">
-        <input type="text" id="username" placeholder="Username">
-        <input type="email" id="email" placeholder="Email">
-        <button id="create-btn">Create User</button>
-    </div>
-    
-    <div id="user-list">
+    <div class="section">
+        <h2>Create New Pet</h2>
+        <div class="input-group">
+            <input type="text" id="username" placeholder="Choose a Username">
+            <input type="email" id="email" placeholder="Your Email">
+            <button id="create-btn">Create & Start</button>
         </div>
+    </div>
+
+    <div class="divider">
+        <span>OR</span>
+    </div>
+
+    <div class="section">
+        <h3>Already have a pet?</h3>
+        <div class="input-group">
+            <input type="text" id="login-username" placeholder="Enter your username">
+            <button id="login-btn">Log In</button>
+        </div>
+    </div>
 </div>
