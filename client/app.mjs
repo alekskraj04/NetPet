@@ -16,7 +16,6 @@ const translations = {
     }
 };
 
-// Determine user language (defaults to English if not Norwegian)
 const lang = navigator.language.startsWith('nb') || navigator.language.startsWith('no') ? 'no' : 'en';
 const t = translations[lang];
 
@@ -28,8 +27,18 @@ class UserManager extends HTMLElement {
     }
 
     async connectedCallback() {
+        // --- NYTT: HUSK BRUKER ---
+        // Sjekker om det finnes et lagret brukernavn i nettleseren
+        const savedUser = localStorage.getItem('netpet_user');
+
+        if (savedUser) {
+            console.log(`Welcome back, ${savedUser}!`);
+            // Hopper rett til spillet hvis vi kjenner brukeren
+            return this.showGameView(savedUser);
+        }
+
         try {
-            // Start by loading the registration form
+            // Hvis ingen bruker er lagret, vis registreringsskjemaet
             const response = await fetch('./views/UserView.html');
             this.shadowRoot.innerHTML = await response.text();
             this.setupEventListeners();
@@ -45,10 +54,8 @@ class UserManager extends HTMLElement {
         }
     }
 
-    // Function that clears the page and displays the game
     async showGameView(username) {
         try {
-            // Safe method: Hide elements in index.html instead of removing them
             const mainHeader = document.querySelector('h1');
             const initialGif = document.querySelector('body > img');
             const footer = document.querySelector('footer');
@@ -57,14 +64,11 @@ class UserManager extends HTMLElement {
             if (initialGif) initialGif.style.setProperty('display', 'none', 'important');
             if (footer) footer.style.setProperty('display', 'none', 'important');
 
-            // Fetch the game HTML
             const response = await fetch('./views/GAMEVIEW.html');
             const html = await response.text();
             
-            // Replace content in shadowRoot
             this.shadowRoot.innerHTML = html;
             
-            // Update the pet name in the game
             const petTitle = this.shadowRoot.querySelector('#pet-name');
             if (petTitle) {
                 petTitle.innerText = `${username}'s NetPet`;
@@ -80,7 +84,6 @@ class UserManager extends HTMLElement {
         const usernameInput = this.shadowRoot.querySelector('#username');
         const emailInput = this.shadowRoot.querySelector('#email');
 
-        // Use translation instead of hardcoded strings
         if (!usernameInput.value || !emailInput.value) {
             return alert(t.fillFields);
         }
@@ -94,7 +97,10 @@ class UserManager extends HTMLElement {
             const response = await request('/api/users', 'POST', newUser);
             console.log(t.userSaved, response);
             
-            // Switch view immediately
+            // --- NYTT: LAGRE BRUKER ---
+            // Lagrer brukernavnet lokalt slik at man slipper å lage ny hver gang
+            localStorage.setItem('netpet_user', newUser.username);
+            
             this.showGameView(newUser.username);
         } catch (error) {
             console.error(t.saveError, error);
@@ -106,6 +112,8 @@ class UserManager extends HTMLElement {
         if (!confirm(`${t.confirmDelete}${username}?`)) return;
         try {
             await request(`/api/users/${username}`, 'DELETE');
+            // Hvis man sletter brukeren, bør vi også fjerne dem fra LocalStorage
+            localStorage.removeItem('netpet_user');
         } catch (error) {
             console.error("Could not delete user:", error);
         }
@@ -114,7 +122,6 @@ class UserManager extends HTMLElement {
 
 customElements.define('user-manager', UserManager);
 
-// --- PWA: SERVICE WORKER REGISTRATION ---
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./sw.js')
