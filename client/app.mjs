@@ -75,7 +75,6 @@ class UserManager extends HTMLElement {
 
         try {
             // Fetch users from the backend
-            // NOTE: Make sure BASE_URL in fetchManager.mjs includes your full Render URL to avoid 404
             const users = await request('/api/users', 'GET');
             
             // Validate both username and password
@@ -132,9 +131,11 @@ class UserManager extends HTMLElement {
             return alert(t.fillFields);
         }
 
+        // Added 'email' to satisfy backend requirements and avoid 400 error
         const newUser = { 
             username: usernameInput.value, 
-            password: passwordInput.value // Storing password instead of email
+            password: passwordInput.value,
+            email: usernameInput.value + "@netpet.no" 
         };
 
         try {

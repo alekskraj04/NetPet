@@ -1,5 +1,10 @@
+// Replace this with your ACTUAL Render backend URL (e.g., https://my-app.onrender.com)
+const BASE_URL = 'https://netpet.onrender.com/'; 
 
-async function request(url, method = 'GET', body = null) {
+async function request(endpoint, method = 'GET', body = null) {
+    // Combine the base URL with the endpoint (e.g., /api/users)
+    const url = `${BASE_URL}${endpoint}`;
+
     const options = {
         method,
         headers: { 'Content-Type': 'application/json' }
