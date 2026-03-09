@@ -7,14 +7,16 @@ const translations = {
         userSaved: "Bruker lagret på Render!",
         saveError: "Kunne ikke lagre bruker til databasen.",
         confirmDelete: "Er du sikker på at du vil slette ",
-        userNotFound: "Brukeren finnes ikke. Vennligst lag en ny pet først!"
+        userNotFound: "Brukeren finnes ikke eller feil passord. Vennligst prøv igjen!",
+        invalidLogin: "Ugyldig brukernavn eller passord."
     },
     en: {
         fillFields: "Please fill in all fields",
         userSaved: "User saved to Render!",
         saveError: "Could not save user to the database.",
         confirmDelete: "Are you sure you want to delete ",
-        userNotFound: "This user does not exist. Please create a new pet first!"
+        userNotFound: "User not found or incorrect password. Please try again!",
+        invalidLogin: "Invalid username or password."
     }
 };
 
@@ -29,7 +31,7 @@ class UserManager extends HTMLElement {
     }
 
     async connectedCallback() {
-        // Check if a user is already stored in the browser
+        // Check if a user is already stored locally for auto-login
         const savedUser = localStorage.getItem('netpet_user');
 
         if (savedUser) {
@@ -38,7 +40,7 @@ class UserManager extends HTMLElement {
         }
 
         try {
-            // Load the registration/login interface
+            // Fetch and render the login/registration interface
             const response = await fetch('./views/UserView.html');
             this.shadowRoot.innerHTML = await response.text();
             this.setupEventListeners();
@@ -48,13 +50,12 @@ class UserManager extends HTMLElement {
     }
 
     setupEventListeners() {
-        // Listener for creating a new user
+        // Attach event listeners for creation and login buttons
         const createBtn = this.shadowRoot.querySelector('#create-btn');
         if (createBtn) {
             createBtn.onclick = () => this.createUser();
         }
 
-        // Listener for logging in existing user
         const loginBtn = this.shadowRoot.querySelector('#login-btn');
         if (loginBtn) {
             loginBtn.onclick = () => this.loginUser();
@@ -63,57 +64,61 @@ class UserManager extends HTMLElement {
 
     async loginUser() {
         const usernameInput = this.shadowRoot.querySelector('#login-username');
+        const passwordInput = this.shadowRoot.querySelector('#login-password');
+        
         const username = usernameInput ? usernameInput.value.trim() : null;
+        const password = passwordInput ? passwordInput.value : null;
 
-        if (!username) {
+        if (!username || !password) {
             return alert(t.fillFields);
         }
 
         try {
-            // Fetch the list of users from the server to verify existence
+            // Fetch users from the backend
+            // NOTE: Make sure BASE_URL in fetchManager.mjs includes your full Render URL to avoid 404
             const users = await request('/api/users', 'GET');
             
-            // Check if the username exists (case-insensitive check)
-            const userExists = users.find(u => u.username.toLowerCase() === username.toLowerCase());
+            // Validate both username and password
+            const user = users.find(u => 
+                u.username.toLowerCase() === username.toLowerCase() && 
+                u.password === password
+            );
 
-            if (userExists) {
-                // User found: Save to local storage and proceed to game
-                localStorage.setItem('netpet_user', userExists.username);
-                this.showGameView(userExists.username);
+            if (user) {
+                // Login successful: persist and show game
+                localStorage.setItem('netpet_user', user.username);
+                this.showGameView(user.username);
             } else {
-                // User not found: Alert the user
-                alert(t.userNotFound || "User not found. Please register first.");
+                // Login failed: show error
+                alert(t.invalidLogin);
             }
         } catch (error) {
             console.error("Login verification failed:", error);
-            alert("Error connecting to server. Please try again.");
+            alert("Connection error. Check your API URL or internet status.");
         }
     }
 
     async showGameView(username) {
         try {
-            // Hide global elements in index.html for a clean game view
-            const mainHeader = document.querySelector('h1');
-            const initialGif = document.querySelector('body > img');
-            const footer = document.querySelector('footer');
+            // Hide initial landing page elements
+            const elementsToHide = ['h1', 'body > img', 'footer'];
+            elementsToHide.forEach(selector => {
+                const el = document.querySelector(selector);
+                if (el) el.style.setProperty('display', 'none', 'important');
+            });
 
-            if (mainHeader) mainHeader.style.setProperty('display', 'none', 'important');
-            if (initialGif) initialGif.style.setProperty('display', 'none', 'important');
-            if (footer) footer.style.setProperty('display', 'none', 'important');
-
-            // Load game view HTML
+            // Load and display the game world
             const response = await fetch('./views/GAMEVIEW.html');
             const html = await response.text();
             
             this.shadowRoot.innerHTML = html;
             
-            // Set the personalized title in the Shadow DOM
             const petTitle = this.shadowRoot.querySelector('#pet-name');
             if (petTitle) {
                 petTitle.innerText = `${username.toUpperCase()}'S PET`;
             }
             
-            console.log(`Stable game view loaded for: ${username}`);
+            console.log(`Game view active for: ${username}`);
         } catch (error) {
             console.error("Error loading GAMEVIEW:", error);
         }
@@ -121,23 +126,23 @@ class UserManager extends HTMLElement {
 
     async createUser() {
         const usernameInput = this.shadowRoot.querySelector('#username');
-        const emailInput = this.shadowRoot.querySelector('#email');
+        const passwordInput = this.shadowRoot.querySelector('#password');
 
-        if (!usernameInput.value || !emailInput.value) {
+        if (!usernameInput.value || !passwordInput.value) {
             return alert(t.fillFields);
         }
 
         const newUser = { 
             username: usernameInput.value, 
-            email: emailInput.value 
+            password: passwordInput.value // Storing password instead of email
         };
 
         try {
-            // Send new user data to the Render backend
+            // Post new user credentials to Render
             const response = await request('/api/users', 'POST', newUser);
             console.log(t.userSaved, response);
             
-            // Persist user locally and switch view
+            // Set local persistence and launch game
             localStorage.setItem('netpet_user', newUser.username);
             this.showGameView(newUser.username);
         } catch (error) {
@@ -149,9 +154,7 @@ class UserManager extends HTMLElement {
     async deleteUser(username) {
         if (!confirm(`${t.confirmDelete}${username}?`)) return;
         try {
-            // Delete user from database
             await request(`/api/users/${username}`, 'DELETE');
-            // Clear local storage and reload to reset the app state
             localStorage.removeItem('netpet_user');
             window.location.reload(); 
         } catch (error) {
@@ -160,10 +163,9 @@ class UserManager extends HTMLElement {
     }
 }
 
-// Register the custom element
 customElements.define('user-manager', UserManager);
 
-// --- PWA: Service Worker Registration ---
+// Service Worker Registration for PWA features
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./sw.js')
