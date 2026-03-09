@@ -1,8 +1,8 @@
-// Replace this with your ACTUAL Render backend URL (e.g., https://my-app.onrender.com)
-const BASE_URL = 'https://netpet.onrender.com/'; 
+// Corrected BASE_URL without the trailing slash to prevent double slashes (//) in the final URL
+const BASE_URL = 'https://netpet.onrender.com'; 
 
 async function request(endpoint, method = 'GET', body = null) {
-    // Combine the base URL with the endpoint (e.g., /api/users)
+    // Combines the base URL with the endpoint (e.g., /api/users)
     const url = `${BASE_URL}${endpoint}`;
 
     const options = {
@@ -16,9 +16,11 @@ async function request(endpoint, method = 'GET', body = null) {
 
     try {
         const response = await fetch(url, options);
+        
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
+        
         return await response.json();
     } catch (error) {
         console.error("Fetch Manager Error:", error);
