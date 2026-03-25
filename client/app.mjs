@@ -93,10 +93,13 @@ class UserManager extends HTMLElement {
 
     async showGameView(username) {
         try {
-            // Hide global layout elements in index.html
-            ['h1', 'body > img', 'footer'].forEach(s => {
-                const el = document.querySelector(s);
-                if (el) el.style.display = 'none';
+            // Hide global layout elements in index.html to avoid duplicates
+            // We specifically hide 'img' to remove the background gif from the landing page
+            ['h1', 'footer', 'img'].forEach(selector => {
+                const elements = document.querySelectorAll(selector);
+                elements.forEach(el => {
+                    if (el) el.style.setProperty('display', 'none', 'important');
+                });
             });
 
             const response = await fetch('./views/GAMEVIEW.html');
@@ -117,7 +120,6 @@ class UserManager extends HTMLElement {
                 
                 if (hungerFill) {
                     hungerFill.style.width = this.hunger + "%";
-                    // Update color based on hunger level
                     hungerFill.style.backgroundColor = this.hunger < 30 ? "#ff4c4c" : "#4caf50";
                 }
             }, 3000);
