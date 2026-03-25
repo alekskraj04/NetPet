@@ -6,13 +6,17 @@ const translations = {
         fillFields: "Vennligst fyll ut alle felt",
         saveError: "Kunne ikke lagre bruker.",
         invalidLogin: "Ugyldig brukernavn eller passord.",
-        connectionError: "Tilkoblingsfeil til server."
+        connectionError: "Tilkoblingsfeil til server.",
+        giftSent: "Energy Booster sendt til ",
+        userNotFound: "Bruker ikke funnet."
     },
     en: {
         fillFields: "Please fill in all fields",
         saveError: "Could not save user.",
         invalidLogin: "Invalid username or password.",
-        connectionError: "Connection error."
+        connectionError: "Connection error.",
+        giftSent: "Energy Booster sent to ",
+        userNotFound: "User not found."
     }
 };
 
@@ -23,12 +27,13 @@ class UserManager extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
-        this.hunger = 100; // Internal pet state
+        this.hunger = 100;
+        this.energy = 100;
+        this.coins = 0;
         this.gameTick = null;
     }
 
     async connectedCallback() {
-        // Auto-login check
         const savedUser = localStorage.getItem('netpet_user');
         if (savedUser) {
             return this.showGameView(savedUser);
@@ -46,31 +51,24 @@ class UserManager extends HTMLElement {
     setupEventListeners() {
         const createBtn = this.shadowRoot.querySelector('#create-btn');
         const loginBtn = this.shadowRoot.querySelector('#login-btn');
-        
         if (createBtn) createBtn.onclick = () => this.createUser();
         if (loginBtn) loginBtn.onclick = () => this.loginUser();
     }
 
     async loginUser() {
-        const usernameInput = this.shadowRoot.querySelector('#login-username');
-        const passwordInput = this.shadowRoot.querySelector('#login-password');
-        
-        const username = usernameInput.value.trim();
-        const password = passwordInput.value;
+        const username = this.shadowRoot.querySelector('#username')?.value.trim() || 
+                         this.shadowRoot.querySelector('#login-username')?.value.trim();
+        const password = this.shadowRoot.querySelector('#password')?.value || 
+                         this.shadowRoot.querySelector('#login-password')?.value;
 
         if (!username || !password) return alert(t.fillFields);
 
         try {
-            // Send request to the dedicated login route on the server
             const response = await request('/api/users/login', 'POST', { username, password });
-            
-            // If the code execution reaches here, the credentials are valid
             localStorage.setItem('netpet_user', response.username);
             this.showGameView(response.username);
         } catch (error) {
-            // FetchManager throws an error on 401 Unauthorized status
             alert(t.invalidLogin);
-            console.error("Login verification failed:", error);
         }
     }
 
@@ -80,10 +78,8 @@ class UserManager extends HTMLElement {
 
         if (!username || !password) return alert(t.fillFields);
 
-        const newUser = { username, password };
-
         try {
-            await request('/api/users', 'POST', newUser);
+            await request('/api/users', 'POST', { username, password });
             localStorage.setItem('netpet_user', username);
             this.showGameView(username);
         } catch (error) {
@@ -93,11 +89,9 @@ class UserManager extends HTMLElement {
 
     async showGameView(username) {
         try {
-            // Hide global layout elements in index.html to avoid duplicates
-            // We specifically hide 'img' to remove the background gif from the landing page
+            // Hide global layout elements in index.html
             ['h1', 'footer', 'img'].forEach(selector => {
-                const elements = document.querySelectorAll(selector);
-                elements.forEach(el => {
+                document.querySelectorAll(selector).forEach(el => {
                     if (el) el.style.setProperty('display', 'none', 'important');
                 });
             });
@@ -106,43 +100,61 @@ class UserManager extends HTMLElement {
             this.shadowRoot.innerHTML = await response.text();
             
             this.shadowRoot.querySelector('#pet-name').innerText = `${username.toUpperCase()}'S PET`;
-            const hungerFill = this.shadowRoot.querySelector('#hunger-fill');
-            const statusText = this.shadowRoot.querySelector('#status-text');
 
             // --- GAME LOOP (TICK) ---
-            // Pet loses 2% hunger every 3 seconds
             this.gameTick = setInterval(() => {
-                this.hunger -= 2;
-                if (this.hunger <= 0) {
-                    this.hunger = 0;
-                    statusText.innerText = "Status: STARVING! 💀";
-                }
-                
-                if (hungerFill) {
-                    hungerFill.style.width = this.hunger + "%";
-                    hungerFill.style.backgroundColor = this.hunger < 30 ? "#ff4c4c" : "#4caf50";
-                }
+                this.hunger = Math.max(0, this.hunger - 2);
+                this.energy = Math.max(0, this.energy - 1);
+                this.updateUI();
             }, 3000);
 
-            // --- FEED BUTTON LOGIC ---
+            // --- BUTTON LOGIC ---
             this.shadowRoot.querySelector('#feed-btn').onclick = () => {
-                this.hunger = Math.min(this.hunger + 20, 100);
-                statusText.innerText = "Status: YUMMY! 🍎";
-                setTimeout(() => {
-                    if (this.hunger > 0) statusText.innerText = "Status: HAPPY!";
-                }, 2000);
+                this.hunger = Math.min(100, this.hunger + 20);
+                this.coins += 5; // Reward coins
+                this.updateUI("Yummy! +5 Coins");
             };
 
-            // --- LOGOUT LOGIC ---
+            this.shadowRoot.querySelector('#sleep-btn').onclick = () => {
+                this.energy = Math.min(100, this.energy + 30);
+                this.updateUI("Zzz... Resting");
+            };
+
+            // SHARE FEATURE: GIFTING
+            this.shadowRoot.querySelector('#gift-btn').onclick = async () => {
+                const recipient = this.shadowRoot.querySelector('#gift-target').value.trim();
+                if (!recipient) return;
+                try {
+                    await request('/api/users/gift', 'POST', { recipient });
+                    alert(t.giftSent + recipient);
+                } catch (e) {
+                    alert(t.userNotFound);
+                }
+            };
+
             this.shadowRoot.querySelector('#logout-btn').onclick = () => {
                 clearInterval(this.gameTick);
                 localStorage.removeItem('netpet_user');
                 window.location.reload();
             };
 
+            this.updateUI();
+
         } catch (error) {
             console.error("Error loading GameView:", error);
         }
+    }
+
+    updateUI(msg = "Happy!") {
+        const hFill = this.shadowRoot.querySelector('#hunger-fill');
+        const eFill = this.shadowRoot.querySelector('#energy-fill');
+        const cCount = this.shadowRoot.querySelector('#coin-count');
+        const sText = this.shadowRoot.querySelector('#status-text');
+
+        if (hFill) hFill.style.width = this.hunger + "%";
+        if (eFill) eFill.style.width = this.energy + "%";
+        if (cCount) cCount.innerText = this.coins;
+        if (sText) sText.innerText = `Status: ${msg}`;
     }
 }
 
