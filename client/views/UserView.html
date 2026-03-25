@@ -3,78 +3,96 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 20px;
+        gap: 15px;
         font-family: 'Pixelify Sans', sans-serif;
     }
 
     .header-container {
         text-align: center;
-        margin-bottom: 10px;
+        margin-bottom: 5px;
     }
 
+    /* Her er overskriften som forsvant - nå i pastell lilla */
     h2 {
-        color: #ffcc00;
-        font-size: 3rem;
+        color: #B4A0FF; 
+        font-size: 3.5rem;
         margin: 0;
         text-transform: uppercase;
-        text-shadow: 3px 3px #000;
+        text-shadow: 2px 2px #fff; /* Hvit skygge for å poppe mot pastell */
+        letter-spacing: 4px;
     }
 
     .sub-header {
-        color: #ffffff;
-        font-size: 1.2rem;
-        margin-top: 5px;
-        text-shadow: 1px 1px #000;
+        color: #6B7280; /* Myk grå tekst */
+        font-size: 1rem;
+        margin-top: -5px;
     }
 
     .form-container {
         display: flex;
         flex-direction: column;
         gap: 15px;
-        background: rgba(0, 0, 0, 0.7);
-        padding: 25px;
-        border-radius: 10px;
-        border: 2px solid #ffcc00;
+        background: white; /* Hvit boks i stedet for mørk grå */
+        padding: 30px;
+        border-radius: 20px;
+        border: 4px solid #BEE3F8; /* Pastell blå ramme */
         width: 280px;
+        box-shadow: 0 10px 20px rgba(180, 160, 255, 0.2);
     }
 
     input {
         padding: 12px;
-        border-radius: 5px;
-        border: none;
+        border-radius: 10px;
+        border: 2px solid #E9D8FD; /* Lys lilla ramme på felt */
         font-family: 'Pixelify Sans', sans-serif;
         font-size: 1rem;
+        background: #F9FAFB;
+        outline: none;
+        color: #4A5568;
+    }
+
+    input::placeholder {
+        color: #A0AEC0;
     }
 
     .button-group {
         display: flex;
         gap: 10px;
         justify-content: center;
+        margin-top: 10px;
     }
 
     button {
-        padding: 10px 15px;
+        padding: 12px 18px;
         cursor: pointer;
         font-family: 'Pixelify Sans', sans-serif;
-        background-color: #ffcc00;
         border: none;
-        border-radius: 5px;
+        border-radius: 12px;
         font-weight: bold;
-        font-size: 0.9rem;
+        font-size: 1rem;
+        transition: all 0.2s ease;
     }
 
     button:hover {
-        background-color: #ffdb4d;
+        transform: scale(1.05);
+        filter: brightness(1.05);
     }
 
+    /* Register-knapp: Pastell Lilla */
+    #create-btn {
+        background-color: #D6BCFA;
+        color: #553C9A;
+    }
+
+    /* Login-knapp: Pastell Blå */
     #login-btn {
-        background-color: #4caf50;
-        color: white;
+        background-color: #BEE3F8;
+        color: #2C5282;
     }
 </style>
 
 <div class="header-container">
-    <h2> </h2>
+    <h2>NETPET</h2>
     <div class="sub-header">Create user or log in</div>
 </div>
 
