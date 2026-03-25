@@ -1,83 +1,145 @@
 <style>
     .game-container { 
         text-align: center; 
-        padding: 20px; 
-        background: #e0f7fa; 
-        border-radius: 15px; 
-        border: 4px solid #00acc1; 
+        padding: 25px; 
+        background: #F7FAFC; /* Nesten hvit pastell */
+        border-radius: 25px; 
+        border: 6px solid #D6BCFA; /* Lilla ramme */
         font-family: 'Pixelify Sans', sans-serif;
         max-width: 400px;
         margin: auto;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
     }
     
     .pet-image {
-        width: 200px;
-        image-rendering: pixelated; /* Beholder pixel-stilen skarp */
-        margin: 10px 0;
+        width: 160px;
+        image-rendering: pixelated;
+        margin: 15px 0;
+    }
+
+    .coins {
+        font-weight: bold;
+        color: #B2F5EA; /* Pastell mint/lys blå */
+        background: #2D3748;
+        display: inline-block;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+    }
+
+    .bar-label {
+        font-size: 0.85rem;
+        text-align: left;
+        width: 85%;
+        margin: 8px auto 0;
+        text-transform: uppercase;
+        color: #4A5568;
+        font-weight: bold;
     }
 
     .status-bar { 
         width: 85%; 
-        background: #ccc; 
-        margin: 15px auto; 
-        height: 25px; 
+        background: #EDF2F7; 
+        margin: 5px auto 12px; 
+        height: 22px; 
         border-radius: 12px; 
-        border: 2px solid #333;
+        border: 2px solid #CBD5E0;
         overflow: hidden;
     }
     
+    /* Hunger-fyll: Pastell Lilla */
     #hunger-fill { 
         width: 100%; 
-        background: #4caf50; 
+        background: #D6BCFA; 
         height: 100%; 
-        transition: width 0.5s ease-in-out, background-color 0.5s; 
+        transition: 0.5s; 
+    }
+
+    /* Energy-fyll: Pastell Blå */
+    #energy-fill { 
+        width: 100%; 
+        background: #BEE3F8; 
+        height: 100%; 
+        transition: 0.5s; 
     }
     
     .button-group {
         display: flex;
         justify-content: center;
-        gap: 15px;
-        margin-top: 25px;
+        gap: 12px;
+        margin-top: 20px;
     }
 
     button {
-        padding: 12px 20px;
-        font-size: 1rem;
+        padding: 12px 18px;
+        font-size: 0.95rem;
         cursor: pointer;
-        border-radius: 8px;
-        border: 3px solid #7a4d86;
-        background-color: #9a67a6;
-        color: white;
+        border-radius: 12px;
+        border: none;
+        background-color: #BEE3F8; /* Pastell blå knapper */
+        color: #2C5282;
         font-family: 'Pixelify Sans', sans-serif;
+        font-weight: bold;
+        transition: transform 0.2s;
     }
 
     button:hover {
         transform: scale(1.05);
+        background-color: #D6BCFA; /* Blir lilla ved hover */
+    }
+
+    .share-box {
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 2px dashed #E2E8F0;
+    }
+
+    .share-box p {
+        color: #718096;
+        margin-bottom: 10px;
+    }
+
+    .share-box input {
+        padding: 10px;
+        width: 60%;
+        border-radius: 8px;
+        border: 2px solid #E2E8F0;
+        font-family: inherit;
+        outline: none;
     }
 
     #logout-btn {
-        background-color: #ff9999;
-        border-color: #cc7777;
-    }
-    
-    #logout-btn:hover {
-        background-color: #ff6666;
+        margin-top: 25px;
+        background-color: #FED7E2; /* Pastell rosa */
+        color: #702459;
     }
 </style>
 
 <div class="game-container">
     <h2 id="pet-name">MY PET</h2>
+    <div class="coins">💰 Coins: <span id="coin-count">0</span></div>
     
-    <img src="/assets/creatureidle.gif" alt="My Pet" class="pet-image">
+    <img src="/assets/creatureidle.gif" alt="Pet" class="pet-image">
     
-    <div class="status-bar">
-        <div id="hunger-fill"></div>
-    </div>
+    <div class="bar-label">Hunger</div>
+    <div class="status-bar"><div id="hunger-fill"></div></div>
     
-    <p id="status-text">Status: HAPPY!</p>
+    <div class="bar-label">Energy</div>
+    <div class="status-bar"><div id="energy-fill"></div></div>
+    
+    <p id="status-text" style="color: #4A5568;">Status: HAPPY!</p>
     
     <div class="button-group">
         <button id="feed-btn">FEED 🍎</button>
-        <button id="logout-btn">LOG OUT 👋</button>
+        <button id="sleep-btn">SLEEP 💤</button>
     </div>
+
+    <div class="share-box">
+        <p style="font-size: 0.9rem;">Send Energy Booster</p>
+        <input type="text" id="gift-target" placeholder="Recipient username">
+        <button id="gift-btn">GIFT ⚡</button>
+    </div>
+
+    <button id="logout-btn">LOG OUT 👋</button>
 </div>
