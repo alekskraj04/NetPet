@@ -1,111 +1,89 @@
 <style>
-    .game-container { 
-        text-align: center; 
-        padding: 20px; 
-        background: #fdf6e3; 
-        border-radius: 15px; 
-        border: 4px solid #859900; 
+    :host {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
         font-family: 'Pixelify Sans', sans-serif;
-        max-width: 400px;
-        margin: auto;
-    }
-    
-    .pet-image {
-        width: 160px;
-        image-rendering: pixelated;
-        margin: 10px 0;
     }
 
-    .coins {
-        font-weight: bold;
-        color: #b58900;
-        font-size: 1.3rem;
+    .header-container {
+        text-align: center;
         margin-bottom: 10px;
     }
 
-    .bar-label {
-        font-size: 0.8rem;
-        text-align: left;
-        width: 85%;
-        margin: 5px auto 0;
+    h2 {
+        color: #ffcc00;
+        font-size: 3rem;
+        margin: 0;
         text-transform: uppercase;
+        text-shadow: 3px 3px #000;
     }
 
-    .status-bar { 
-        width: 85%; 
-        background: #eee; 
-        margin: 5px auto 10px; 
-        height: 18px; 
-        border-radius: 10px; 
-        border: 2px solid #333;
-        overflow: hidden;
+    .sub-header {
+        color: #ffffff;
+        font-size: 1.2rem;
+        margin-top: 5px;
+        text-shadow: 1px 1px #000;
     }
-    
-    #hunger-fill { width: 100%; background: #cb4b16; height: 100%; transition: 0.5s; }
-    #energy-fill { width: 100%; background: #268bd2; height: 100%; transition: 0.5s; }
-    
+
+    .form-container {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 25px;
+        border-radius: 10px;
+        border: 2px solid #ffcc00;
+        width: 280px;
+    }
+
+    input {
+        padding: 12px;
+        border-radius: 5px;
+        border: none;
+        font-family: 'Pixelify Sans', sans-serif;
+        font-size: 1rem;
+    }
+
     .button-group {
         display: flex;
-        justify-content: center;
         gap: 10px;
-        margin-top: 15px;
+        justify-content: center;
     }
 
     button {
         padding: 10px 15px;
-        font-size: 0.9rem;
         cursor: pointer;
-        border-radius: 5px;
-        border: none;
-        background-color: #859900;
-        color: white;
         font-family: 'Pixelify Sans', sans-serif;
-    }
-
-    .share-box {
-        margin-top: 20px;
-        padding-top: 15px;
-        border-top: 1px dashed #999;
-    }
-
-    .share-box input {
-        padding: 8px;
-        width: 60%;
+        background-color: #ffcc00;
+        border: none;
         border-radius: 5px;
-        border: 1px solid #ccc;
-        font-family: inherit;
+        font-weight: bold;
+        font-size: 0.9rem;
     }
 
-    #logout-btn {
-        margin-top: 20px;
-        background-color: #dc322f;
+    button:hover {
+        background-color: #ffdb4d;
+    }
+
+    #login-btn {
+        background-color: #4caf50;
+        color: white;
     }
 </style>
 
-<div class="game-container">
-    <h2 id="pet-name">MY PET</h2>
-    <div class="coins">💰 Coins: <span id="coin-count">0</span></div>
-    
-    <img src="/assets/creatureidle.gif" alt="Pet" class="pet-image">
-    
-    <div class="bar-label">Hunger</div>
-    <div class="status-bar"><div id="hunger-fill"></div></div>
-    
-    <div class="bar-label">Energy</div>
-    <div class="status-bar"><div id="energy-fill"></div></div>
-    
-    <p id="status-text">Status: HAPPY!</p>
+<div class="header-container">
+    <h2>NetPet</h2>
+    <div class="sub-header">Create user or log in</div>
+</div>
+
+<div class="form-container">
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
     
     <div class="button-group">
-        <button id="feed-btn">FEED 🍎</button>
-        <button id="sleep-btn">SLEEP 💤</button>
+        <button id="create-btn">Register</button>
+        <button id="login-btn">Log In</button>
     </div>
-
-    <div class="share-box">
-        <p style="font-size: 0.9rem;">Send Energy Booster</p>
-        <input type="text" id="gift-target" placeholder="Recipient username">
-        <button id="gift-btn">GIFT ⚡</button>
-    </div>
-
-    <button id="logout-btn">LOG OUT 👋</button>
 </div>
