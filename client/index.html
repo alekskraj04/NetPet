@@ -14,19 +14,84 @@
     <link rel="apple-touch-icon" href="./assets/icon-192.png">
     <link rel="manifest" href="./manifest.json">
     
-    <link rel="stylesheet" href="./css/app.css">
+    <style>
+        /* Hovedstil for hele siden */
+        body {
+            margin: 0;
+            padding: 0;
+            /* Myk pastell-gradient */
+            background: linear-gradient(135deg, #E9D8FD 0%, #BEE3F8 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Pixelify Sans', sans-serif;
+            color: #4A5568;
+        }
+
+        main {
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+        }
+
+        /* Skjuler den store H1-tittelen siden UserView har sin egen logo */
+        h1 {
+            display: none;
+        }
+
+        /* Den store gifen på forsiden - gjort litt mindre "røff" */
+        .front-gif {
+            width: 120px;
+            height: auto;
+            display: block;
+            margin: 0 auto 20px;
+            filter: drop-shadow(0 5px 15px rgba(180, 160, 255, 0.4));
+        }
+
+        footer {
+            position: fixed;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+        }
+
+        footer hr {
+            border: 0;
+            border-top: 1px solid rgba(180, 160, 255, 0.3);
+            width: 50%;
+            margin: 10px auto;
+        }
+
+        footer a {
+            color: #553C9A;
+            text-decoration: none;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        footer a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        /* Skjuler alt i index når spillet starter (håndteres av app.mjs) */
+        .hidden {
+            display: none !important;
+        }
+    </style>
 </head>
 <body>
 
-    <main>
-        <h1>NetPet</h1>
+    <main id="main-content">
+        <img src="./assets/creatureidle.gif" alt="creature idle movement" class="front-gif">
         
-        <img src="./assets/creatureidle.gif" alt="creature idle movement" style="width: 150px; height: auto; display: block; margin: 20px auto;">
-
         <user-manager></user-manager>
     </main>
 
-    <footer>
+    <footer id="main-footer">
         <hr>
         <nav aria-label="Juridisk informasjon">
             <a href="tos.html">Terms of Service</a> | 
