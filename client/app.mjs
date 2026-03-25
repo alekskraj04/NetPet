@@ -1,6 +1,6 @@
 import request from './modules/fetchManager.mjs';
 
-// --- Translations ---
+// --- Translations (I18n) ---
 const translations = {
     no: {
         fillFields: "Vennligst fyll ut alle felt",
@@ -23,11 +23,12 @@ class UserManager extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
-        this.hunger = 100; // Intern stats for sult
+        this.hunger = 100; // Internal pet state
         this.gameTick = null;
     }
 
     async connectedCallback() {
+        // Auto-login check
         const savedUser = localStorage.getItem('netpet_user');
         if (savedUser) {
             return this.showGameView(savedUser);
@@ -51,26 +52,25 @@ class UserManager extends HTMLElement {
     }
 
     async loginUser() {
-        const username = this.shadowRoot.querySelector('#login-username').value.trim();
-        const password = this.shadowRoot.querySelector('#login-password').value;
+        const usernameInput = this.shadowRoot.querySelector('#login-username');
+        const passwordInput = this.shadowRoot.querySelector('#login-password');
+        
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value;
 
         if (!username || !password) return alert(t.fillFields);
 
         try {
-            const users = await request('/api/users', 'GET');
-            // Vi finner brukeren i lista
-            const user = users.find(u => u.username.toLowerCase() === username.toLowerCase());
+            // Send request to the dedicated login route on the server
+            const response = await request('/api/users/login', 'POST', { username, password });
             
-            // I et fullverdig system ville vi sjekket bcrypt-hashen på server-side,
-            // men for denne innleveringen lar vi appen gå videre hvis brukeren finnes.
-            if (user) {
-                localStorage.setItem('netpet_user', username);
-                this.showGameView(username);
-            } else {
-                alert(t.invalidLogin);
-            }
+            // If the code execution reaches here, the credentials are valid
+            localStorage.setItem('netpet_user', response.username);
+            this.showGameView(response.username);
         } catch (error) {
-            alert(t.connectionError);
+            // FetchManager throws an error on 401 Unauthorized status
+            alert(t.invalidLogin);
+            console.error("Login verification failed:", error);
         }
     }
 
@@ -93,7 +93,7 @@ class UserManager extends HTMLElement {
 
     async showGameView(username) {
         try {
-            // Skjul elementer i index.html
+            // Hide global layout elements in index.html
             ['h1', 'body > img', 'footer'].forEach(s => {
                 const el = document.querySelector(s);
                 if (el) el.style.display = 'none';
@@ -107,7 +107,7 @@ class UserManager extends HTMLElement {
             const statusText = this.shadowRoot.querySelector('#status-text');
 
             // --- GAME LOOP (TICK) ---
-            // Kjæledyret mister 2% sult hvert 3. sekund
+            // Pet loses 2% hunger every 3 seconds
             this.gameTick = setInterval(() => {
                 this.hunger -= 2;
                 if (this.hunger <= 0) {
@@ -117,11 +117,12 @@ class UserManager extends HTMLElement {
                 
                 if (hungerFill) {
                     hungerFill.style.width = this.hunger + "%";
+                    // Update color based on hunger level
                     hungerFill.style.backgroundColor = this.hunger < 30 ? "#ff4c4c" : "#4caf50";
                 }
             }, 3000);
 
-            // --- FEED BUTTON ---
+            // --- FEED BUTTON LOGIC ---
             this.shadowRoot.querySelector('#feed-btn').onclick = () => {
                 this.hunger = Math.min(this.hunger + 20, 100);
                 statusText.innerText = "Status: YUMMY! 🍎";
@@ -130,7 +131,7 @@ class UserManager extends HTMLElement {
                 }, 2000);
             };
 
-            // --- LOGOUT ---
+            // --- LOGOUT LOGIC ---
             this.shadowRoot.querySelector('#logout-btn').onclick = () => {
                 clearInterval(this.gameTick);
                 localStorage.removeItem('netpet_user');

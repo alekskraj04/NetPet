@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 
 const router = express.Router();
 
-// 1. Create User with Password Hashing
+// 1. Registration: Hashes the password before saving to the database
 router.post('/', async (req, res) => {
     const { username, password } = req.body;
 
@@ -13,9 +13,8 @@ router.post('/', async (req, res) => {
     }
 
     try {
-        // Sikker lagring: Hasher passordet før det lagres i PostgreSQL
+        // Secure storage: Hash the password with 10 salt rounds
         const hashedPassword = await bcrypt.hash(password, 10);
-
         const queryText = `
             INSERT INTO users (username, password) 
             VALUES ($1, $2) 
@@ -23,31 +22,40 @@ router.post('/', async (req, res) => {
         `;
         
         const result = await pool.query(queryText, [username, hashedPassword]);
-        const newUser = result.rows[0];
-
-        console.log(`User created with hashed password: ${username}`);
-        
-        res.status(201).json({
-            message: "User created successfully!",
-            user: newUser
-        });
+        res.status(201).json({ message: "User created successfully!", user: result.rows[0] });
     } catch (error) {
+        // Handle duplicate username error from PostgreSQL
         if (error.code === '23505') {
             return res.status(409).json({ message: "Username already taken." });
         }
-        console.error("Database error:", error);
         res.status(500).json({ message: "Internal server error." });
     }
 });
 
-// 2. Get Users (For simple login verification)
-router.get('/', async (req, res) => {
+// 2. Secure Login: Verifies the hashed password using bcrypt.compare
+router.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+        return res.status(400).json({ message: "Username and password are required." });
+    }
+
     try {
-        // Vi henter brukernavn og det hashede passordet for å sjekke mot login
-        const result = await pool.query('SELECT username, password FROM users');
-        res.json(result.rows);
+        const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+        const user = result.rows[0];
+
+        if (user) {
+            // Compare the provided plaintext password with the hash in the DB
+            const match = await bcrypt.compare(password, user.password);
+            if (match) {
+                return res.json({ message: "Login successful", username: user.username });
+            }
+        }
+        
+        // Return 401 (Unauthorized) if user doesn't exist or password is wrong
+        res.status(401).json({ message: "Invalid username or password" });
     } catch (error) {
-        res.status(500).json({ message: "Could not fetch users." });
+        res.status(500).json({ message: "Server error during login" });
     }
 });
 
