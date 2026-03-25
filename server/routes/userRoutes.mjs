@@ -59,7 +59,32 @@ router.post('/login', async (req, res) => {
     }
 });
 
-// 3. Delete Account
+// 3. Share/Gift: Sends an "Energy Booster" to another user
+router.post('/gift', async (req, res) => {
+    const { recipient } = req.body;
+
+    if (!recipient) {
+        return res.status(400).json({ message: "Recipient username is required." });
+    }
+
+    try {
+        // Check if the recipient exists in the database
+        const result = await pool.query('SELECT username FROM users WHERE username = $1', [recipient]);
+        
+        if (result.rows.length > 0) {
+            // In a more advanced version, you could update a "mailbox" or "energy" column here.
+            // For now, we confirm the user exists to validate the "Share" action.
+            return res.json({ message: `Energy Booster successfully sent to ${recipient}!` });
+        } else {
+            return res.status(404).json({ message: "Recipient not found." });
+        }
+    } catch (error) {
+        console.error("Gifting error:", error);
+        res.status(500).json({ message: "Server error during gifting." });
+    }
+});
+
+// 4. Delete Account
 router.delete('/:username', async (req, res) => {
     const username = req.params.username;
     try {
