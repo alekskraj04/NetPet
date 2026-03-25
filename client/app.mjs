@@ -1,6 +1,6 @@
 import request from './modules/fetchManager.mjs';
 
-// --- Translations (I18n) ---
+// --- Oversettelser ---
 const translations = {
     no: {
         fillFields: "Vennligst fyll ut alle felt",
@@ -34,8 +34,7 @@ class UserManager extends HTMLElement {
     async connectedCallback() {
         const savedUser = localStorage.getItem('netpet_user');
         
-        // Sjekker om brukeren faktisk eksisterer i minnet
-        if (savedUser && savedUser !== "null" && savedUser !== "undefined") {
+        if (savedUser && savedUser !== "null" && savedUser !== "undefined" && savedUser !== "") {
             return this.showGameView(savedUser);
         }
 
@@ -55,6 +54,7 @@ class UserManager extends HTMLElement {
     setupEventListeners() {
         const createBtn = this.shadowRoot.querySelector('#create-btn');
         const loginBtn = this.shadowRoot.querySelector('#login-btn');
+        
         if (createBtn) createBtn.onclick = () => this.createUser();
         if (loginBtn) loginBtn.onclick = () => this.loginUser();
     }
@@ -78,8 +78,11 @@ class UserManager extends HTMLElement {
     }
 
     async createUser() {
-        const username = this.shadowRoot.querySelector('#username')?.value.trim();
-        const password = this.shadowRoot.querySelector('#password')?.value;
+        const usernameInput = this.shadowRoot.querySelector('#username');
+        const passwordInput = this.shadowRoot.querySelector('#password');
+
+        const username = usernameInput?.value.trim();
+        const password = passwordInput?.value;
 
         if (!username || !password) return alert(t.fillFields);
 
@@ -94,29 +97,34 @@ class UserManager extends HTMLElement {
 
     async showGameView(username) {
         try {
-            // Skjul elementer i index.html for å unngå visuelt rot
+            // Skjuler elementer i index.html (Fiks for dobbel GIF)
             const globalUI = document.querySelectorAll('h1, footer, img, .background-gif');
             globalUI.forEach(el => el.style.display = 'none');
 
             const response = await fetch('./views/GAMEVIEW.html');
-            const html = await response.text();
-            this.shadowRoot.innerHTML = html;
+            this.shadowRoot.innerHTML = await response.text();
             
-            this.shadowRoot.querySelector('#pet-name').innerText = `${username.toUpperCase()}'S PET`;
+            const nameTag = this.shadowRoot.querySelector('#pet-name');
+            if (nameTag) nameTag.innerText = `${username.toUpperCase()}'S PET`;
 
             // Start spill-loop
+            if (this.gameTick) clearInterval(this.gameTick);
             this.gameTick = setInterval(() => {
                 this.hunger = Math.max(0, this.hunger - 2);
                 this.energy = Math.max(0, this.energy - 1);
                 this.updateUI();
             }, 3000);
 
-            // Knappe-logikk
-            this.shadowRoot.querySelector('#feed-btn').onclick = () => {
-                this.hunger = Math.min(100, this.hunger + 20);
-                this.coins += 5;
-                this.updateUI("Yummy! +5 Coins");
-            };
+            // --- KNAPPE-LOGIKK (Feilsikret med 'if') ---
+            
+            const feedBtn = this.shadowRoot.querySelector('#feed-btn');
+            if (feedBtn) {
+                feedBtn.onclick = () => {
+                    this.hunger = Math.min(100, this.hunger + 20);
+                    this.coins += 5;
+                    this.updateUI("Yummy! +5 Coins");
+                };
+            }
 
             const sleepBtn = this.shadowRoot.querySelector('#sleep-btn');
             if (sleepBtn) {
@@ -126,20 +134,24 @@ class UserManager extends HTMLElement {
                 };
             }
 
-            this.shadowRoot.querySelector('#gift-btn').onclick = async () => {
-                const recipient = this.shadowRoot.querySelector('#gift-target').value.trim();
-                if (!recipient) return;
-                try {
-                    await request('/api/users/gift', 'POST', { recipient });
-                    alert(t.giftSent + recipient);
-                } catch (e) {
-                    alert(t.userNotFound);
-                }
-            };
+            const giftBtn = this.shadowRoot.querySelector('#gift-btn');
+            if (giftBtn) {
+                giftBtn.onclick = async () => {
+                    const recipient = this.shadowRoot.querySelector('#gift-target')?.value.trim();
+                    if (!recipient) return;
+                    try {
+                        await request('/api/users/gift', 'POST', { recipient });
+                        alert(t.giftSent + recipient);
+                    } catch (e) {
+                        alert(t.userNotFound);
+                    }
+                };
+            }
 
-            this.shadowRoot.querySelector('#logout-btn').onclick = () => {
-                this.logout();
-            };
+            const logoutBtn = this.shadowRoot.querySelector('#logout-btn');
+            if (logoutBtn) {
+                logoutBtn.onclick = () => this.logout();
+            }
 
             this.updateUI();
         } catch (error) {
@@ -150,12 +162,8 @@ class UserManager extends HTMLElement {
     logout() {
         clearInterval(this.gameTick);
         localStorage.removeItem('netpet_user');
-        // Resetter interne verdier
-        this.hunger = 100;
-        this.energy = 100;
-        this.coins = 0;
-        // Går tilbake til start
-        window.location.reload();
+        localStorage.clear();
+        window.location.reload(); 
     }
 
     updateUI(msg = "Happy!") {
