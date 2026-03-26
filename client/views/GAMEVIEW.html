@@ -2,9 +2,9 @@
     .game-container { 
         text-align: center; 
         padding: 25px; 
-        background: #F7FAFC; /* Nesten hvit pastell */
+        background: #F7FAFC; 
         border-radius: 25px; 
-        border: 6px solid #D6BCFA; /* Lilla ramme */
+        border: 6px solid #D6BCFA; 
         font-family: 'Pixelify Sans', sans-serif;
         max-width: 400px;
         margin: auto;
@@ -15,17 +15,6 @@
         width: 160px;
         image-rendering: pixelated;
         margin: 15px 0;
-    }
-
-    .coins {
-        font-weight: bold;
-        color: #B2F5EA; /* Pastell mint/lys blå */
-        background: #2D3748;
-        display: inline-block;
-        padding: 5px 15px;
-        border-radius: 20px;
-        font-size: 1.2rem;
-        margin-bottom: 15px;
     }
 
     .bar-label {
@@ -48,21 +37,8 @@
         overflow: hidden;
     }
     
-    /* Hunger-fyll: Pastell Lilla */
-    #hunger-fill { 
-        width: 100%; 
-        background: #D6BCFA; 
-        height: 100%; 
-        transition: 0.5s; 
-    }
-
-    /* Energy-fyll: Pastell Blå */
-    #energy-fill { 
-        width: 100%; 
-        background: #BEE3F8; 
-        height: 100%; 
-        transition: 0.5s; 
-    }
+    #hunger-fill { width: 100%; background: #D6BCFA; height: 100%; transition: 0.5s; }
+    #energy-fill { width: 100%; background: #BEE3F8; height: 100%; transition: 0.5s; }
     
     .button-group {
         display: flex;
@@ -77,7 +53,7 @@
         cursor: pointer;
         border-radius: 12px;
         border: none;
-        background-color: #BEE3F8; /* Pastell blå knapper */
+        background-color: #BEE3F8;
         color: #2C5282;
         font-family: 'Pixelify Sans', sans-serif;
         font-weight: bold;
@@ -86,7 +62,7 @@
 
     button:hover {
         transform: scale(1.05);
-        background-color: #D6BCFA; /* Blir lilla ved hover */
+        background-color: #D6BCFA;
     }
 
     .share-box {
@@ -95,10 +71,7 @@
         border-top: 2px dashed #E2E8F0;
     }
 
-    .share-box p {
-        color: #718096;
-        margin-bottom: 10px;
-    }
+    .share-box p { color: #718096; margin-bottom: 10px; }
 
     .share-box input {
         padding: 10px;
@@ -111,16 +84,15 @@
 
     #logout-btn {
         margin-top: 25px;
-        background-color: #FED7E2; /* Pastell rosa */
+        background-color: #FED7E2;
         color: #702459;
     }
 </style>
 
 <div class="game-container">
     <h2 id="pet-name">MY PET</h2>
-    <div class="coins">💰 Coins: <span id="coin-count">0</span></div>
     
-    <img src="/assets/creatureidle.gif" alt="Pet" class="pet-image">
+    <img src="/assets/creatureidle.gif" alt="Pet" class="pet-image" id="pet-image">
     
     <div class="bar-label">Hunger</div>
     <div class="status-bar"><div id="hunger-fill"></div></div>
