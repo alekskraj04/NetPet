@@ -84,7 +84,6 @@ class UserManager extends HTMLElement {
             localStorage.setItem('netpet_user', username);
             this.showGameView(username);
         } catch (error) {
-            // Fikser 409-feilen her
             if (error.message.includes('409')) {
                 alert(t.usernameTaken);
             } else {
@@ -95,7 +94,6 @@ class UserManager extends HTMLElement {
 
     async showGameView(username) {
         try {
-            // Skjuler elementer fra index.html
             const globalUI = document.querySelectorAll('h1, footer, .front-gif');
             globalUI.forEach(el => el.style.display = 'none');
 
@@ -106,9 +104,11 @@ class UserManager extends HTMLElement {
             if (nameTag) nameTag.innerText = `${username.toUpperCase()}'S PET`;
 
             if (this.gameTick) clearInterval(this.gameTick);
+            
+            // HER JUSTERER DU HASTIGHETEN:
             this.gameTick = setInterval(() => {
                 this.hunger = Math.max(0, this.hunger - 2);
-                this.energy = Math.max(0, this.energy - 1);
+                this.energy = Math.max(0, this.energy - 3); // Endret fra -1 til -3 for raskere tiredness
                 this.updateUI();
             }, 3000);
 
@@ -148,6 +148,13 @@ class UserManager extends HTMLElement {
         }
     }
 
+    // NY REVIVE FUNKSJON
+    revive() {
+        this.hunger = 100;
+        this.energy = 100;
+        this.updateUI("I'm back!");
+    }
+
     logout() {
         clearInterval(this.gameTick);
         localStorage.removeItem('netpet_user');
@@ -164,10 +171,27 @@ class UserManager extends HTMLElement {
         if (eFill) eFill.style.width = this.energy + "%";
 
         if (pImg) {
-            // Sjekker GIF-stier basert på din mappestruktur
             if (this.hunger <= 0 && this.energy <= 0) {
                 pImg.src = "./assets/dead.gif";
-                if (sText) sText.innerText = "Status: Oh no! 💀";
+                if (sText) {
+                    // Legger til en knapp i status-teksten når den dør
+                    sText.innerHTML = `
+                        <div style="margin-top: 10px;">
+                            <p>Oh no! 💀</p>
+                            <button id="revive-btn" style="
+                                background: #FF6B6B; 
+                                color: white; 
+                                border: none; 
+                                padding: 8px 16px; 
+                                font-family: 'Pixelify Sans'; 
+                                cursor: pointer;
+                                border-radius: 4px;">
+                                REVIVE
+                            </button>
+                        </div>
+                    `;
+                    this.shadowRoot.querySelector('#revive-btn').onclick = () => this.revive();
+                }
             } 
             else if (this.hunger < 50 || this.energy < 50) {
                 pImg.src = "./assets/sad.gif";
