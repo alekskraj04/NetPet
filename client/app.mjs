@@ -107,16 +107,20 @@ class UserManager extends HTMLElement {
             const feedBtn = this.shadowRoot.querySelector('#feed-btn');
             if (feedBtn) {
                 feedBtn.onclick = () => {
-                    this.hunger = Math.min(100, this.hunger + 20);
-                    this.updateUI("Yummy!");
+                    if (this.hunger > 0 || this.energy > 0) { // Kan bare mate hvis ikke død
+                        this.hunger = Math.min(100, this.hunger + 20);
+                        this.updateUI("Yummy!");
+                    }
                 };
             }
 
             const sleepBtn = this.shadowRoot.querySelector('#sleep-btn');
             if (sleepBtn) {
                 sleepBtn.onclick = () => {
-                    this.energy = Math.min(100, this.energy + 30);
-                    this.updateUI("Zzz...");
+                    if (this.hunger > 0 || this.energy > 0) {
+                        this.energy = Math.min(100, this.energy + 30);
+                        this.updateUI("Zzz...");
+                    }
                 };
             }
 
@@ -158,12 +162,19 @@ class UserManager extends HTMLElement {
         if (hFill) hFill.style.width = this.hunger + "%";
         if (eFill) eFill.style.width = this.energy + "%";
 
-        // Bytte GIF hvis dyret er veldig sulten OG trøtt
         if (pImg) {
-            if (this.hunger < 30 && this.energy < 30) {
-                pImg.src = "/assets/creaturesad.gif";
-                if (sText) sText.innerText = "Status: I'm sad and tired...";
-            } else {
+            // 1. Sjekk først om dyret er dødt (0% på begge)
+            if (this.hunger <= 0 && this.energy <= 0) {
+                pImg.src = "/assets/dead.gif";
+                if (sText) sText.innerText = "Status: Oh no! Your pet is dead... 💀";
+            } 
+            // 2. Sjekk om den er trist (Under 50% på sult ELLER energi)
+            else if (this.hunger < 50 || this.energy < 50) {
+                pImg.src = "/assets/sad.gif";
+                if (sText) sText.innerText = "Status: I'm feeling a bit down...";
+            } 
+            // 3. Ellers er den glad (Idle)
+            else {
                 pImg.src = "/assets/creatureidle.gif";
                 if (sText) sText.innerText = `Status: ${msg}`;
             }
