@@ -105,10 +105,9 @@ class UserManager extends HTMLElement {
 
             if (this.gameTick) clearInterval(this.gameTick);
             
-            // HER JUSTERER DU HASTIGHETEN:
             this.gameTick = setInterval(() => {
                 this.hunger = Math.max(0, this.hunger - 2);
-                this.energy = Math.max(0, this.energy - 3); // Endret fra -1 til -3 for raskere tiredness
+                this.energy = Math.max(0, this.energy - 3); 
                 this.updateUI();
             }, 3000);
 
@@ -148,7 +147,6 @@ class UserManager extends HTMLElement {
         }
     }
 
-    // NY REVIVE FUNKSJON
     revive() {
         this.hunger = 100;
         this.energy = 100;
@@ -171,10 +169,14 @@ class UserManager extends HTMLElement {
         if (eFill) eFill.style.width = this.energy + "%";
 
         if (pImg) {
+            // GJØR GIFS STØRRE OG SKARPE
+            pImg.style.width = "250px"; 
+            pImg.style.height = "auto";
+            pImg.style.imageRendering = "pixelated";
+
             if (this.hunger <= 0 && this.energy <= 0) {
                 pImg.src = "./assets/dead.gif";
                 if (sText) {
-                    // Legger til en knapp i status-teksten når den dør
                     sText.innerHTML = `
                         <div style="margin-top: 10px;">
                             <p>Oh no! 💀</p>
@@ -185,7 +187,8 @@ class UserManager extends HTMLElement {
                                 padding: 8px 16px; 
                                 font-family: 'Pixelify Sans'; 
                                 cursor: pointer;
-                                border-radius: 4px;">
+                                border-radius: 4px;
+                                box-shadow: 0 4px #b83b3b;">
                                 REVIVE
                             </button>
                         </div>
