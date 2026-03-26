@@ -10,31 +10,35 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// Middleware
+// Global Middleware
 app.use(express.json());
 
-// 1. VIKTIG: Gjør assets-mappen tilgjengelig for nettleseren
-// Dette gjør at <img src="/assets/..."> fungerer på Render
+/**
+ * Static File Serving
+ * 1. Serve game assets (images, gifs)
+ * 2. Serve client-side files (HTML, CSS, JS modules)
+ */
 app.use('/assets', express.static(path.join(__dirname, '../assets')));
-
-// 2. Serve statiske filer fra client-mappen (css, js, views)
 app.use(express.static(path.join(__dirname, '../client')));
 
-// API Routes
+// API Routes Configuration
 app.use('/api/users', userRoutes);
 app.use('/api/pets', petRoutes);
 
-// Enkel rute for å servere index.html som hovedside
+// Root route to serve the main frontend entry point
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/index.html'));
 });
 
 const PORT = process.env.PORT || 3000;
 
-// Initialize database before starting the server
+/**
+ * Server Initialization
+ * Ensures the database is connected/initialized before the server starts listening
+ */
 initializeDatabase().then(() => {
     app.listen(PORT, () => {
-        console.log(`NetPet API running on http://localhost:${PORT}`);
+        console.log(`NetPet API running on port ${PORT}`);
     });
 }).catch(err => {
     console.error("Failed to start server due to database error:", err);

@@ -1,8 +1,6 @@
-// Corrected BASE_URL without the trailing slash to prevent double slashes (//) in the final URL
 const BASE_URL = 'https://netpet.onrender.com'; 
 
 async function request(endpoint, method = 'GET', body = null) {
-    // Combines the base URL with the endpoint (e.g., /api/users)
     const url = `${BASE_URL}${endpoint}`;
 
     const options = {

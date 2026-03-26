@@ -1,9 +1,9 @@
-/* Importerer Pixelify Sans direkte i CSS-en som en sikkerhet */
+/* Import Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');
 
 body {
     font-family: 'Pixelify Sans', sans-serif;
-    background-color: #dcf4f7; /* NetPet lyseblå */
+    background-color: #dcf4f7;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -12,32 +12,30 @@ body {
     min-height: 100vh;
 }
 
-/* Den massive Pixel-headeren */
+/* Pixel-style Header */
 h1 { 
     color: #caa3d3; 
-    font-size: 5rem; /* Kjempestor */
+    font-size: 5rem;
     margin-top: 40px;
     margin-bottom: 20px;
     text-align: center;
     text-transform: uppercase;
     letter-spacing: 4px;
-    /* En "blocky" skygge som passer pixel-stilen */
     text-shadow: 5px 5px 0px rgba(0, 0, 0, 0.1); 
 }
 
-/* Beholder bredden på komponenten din */
 user-manager {
     width: 80%;
     max-width: 600px;
 }
 
-/* Tvinger alle knapper og felt til å bruke den kule fonten */
+/* Apply pixel font to all form elements */
 button, input, select, textarea {
     font-family: 'Pixelify Sans', sans-serif;
     font-size: 1.2rem;
 }
 
-/* En liten bonus: gjør knappen litt mer "gamey" */
+/* Game-style Button UI */
 button {
     background-color: #9a67a6;
     color: white;
@@ -52,7 +50,6 @@ button:hover {
     background-color: #ecc0fa;
 }
 
-/* Footer-stil */
 footer {
     margin-top: 50px;
     text-align: center;

@@ -33,8 +33,9 @@ class UserManager extends HTMLElement {
 
     async connectedCallback() {
         const savedUser = localStorage.getItem('netpet_user');
+        
         if (savedUser && savedUser !== "null" && savedUser !== "" && savedUser !== "undefined") {
-            // Hent lagrede stats for denne spesifikke brukeren
+            // Load stats for the specific user
             const savedHunger = localStorage.getItem(`${savedUser}_hunger`);
             const savedEnergy = localStorage.getItem(`${savedUser}_energy`);
             
@@ -48,7 +49,7 @@ class UserManager extends HTMLElement {
         this.showLoginView();
     }
 
-    // Regner ut tidsforskjell og trekker fra poeng
+    // Calculates time difference and deducts points while the app was closed
     calculateOfflineProgress(username) {
         const lastSeen = localStorage.getItem(`${username}_lastSeen`);
         if (!lastSeen) return;
@@ -56,9 +57,7 @@ class UserManager extends HTMLElement {
         const now = Date.now();
         const secondsPassed = Math.floor((now - Number(lastSeen)) / 1000);
         
-        // Siden vi trekker fra hvert 3. sekund i spillet:
-        // Hunger: 2 poeng / 3 sek = 0.66 per sek
-        // Energy: 3 poeng / 3 sek = 1.00 per sek
+        // Decay logic: Hunger -2/3s (~0.66/s), Energy -3/3s (1.00/s)
         const hungerLoss = Math.floor(secondsPassed * (2 / 3));
         const energyLoss = Math.floor(secondsPassed * 1);
 
@@ -123,6 +122,7 @@ class UserManager extends HTMLElement {
 
     async showGameView(username) {
         try {
+            // Hide global landing page elements
             const globalUI = document.querySelectorAll('h1, footer, .front-gif');
             globalUI.forEach(el => el.style.display = 'none');
 
@@ -134,11 +134,12 @@ class UserManager extends HTMLElement {
 
             if (this.gameTick) clearInterval(this.gameTick);
             
+            // Core Game Loop
             this.gameTick = setInterval(() => {
                 this.hunger = Math.max(0, this.hunger - 2);
                 this.energy = Math.max(0, this.energy - 3); 
                 
-                // Lagre nåværende status og tidspunkt lokalt
+                // Persistence: Save current state and timestamp
                 localStorage.setItem(`${username}_hunger`, this.hunger);
                 localStorage.setItem(`${username}_energy`, this.energy);
                 localStorage.setItem(`${username}_lastSeen`, Date.now());
@@ -204,10 +205,12 @@ class UserManager extends HTMLElement {
         if (eFill) eFill.style.width = this.energy + "%";
 
         if (pImg) {
+            // Asset styling
             pImg.style.width = "250px"; 
             pImg.style.height = "auto";
             pImg.style.imageRendering = "pixelated";
 
+            // State management: Dead
             if (this.hunger <= 0 && this.energy <= 0) {
                 pImg.src = "./assets/dead.gif";
                 if (sText) {
@@ -230,10 +233,12 @@ class UserManager extends HTMLElement {
                     this.shadowRoot.querySelector('#revive-btn').onclick = () => this.revive();
                 }
             } 
+            // State management: Sad
             else if (this.hunger < 50 || this.energy < 50) {
                 pImg.src = "./assets/sad.gif";
                 if (sText) sText.innerText = "Status: I'm feeling a bit down...";
             } 
+            // State management: Normal/Idle
             else {
                 pImg.src = "./assets/creatureidle.gif";
                 if (sText) sText.innerText = `Status: ${msg}`;

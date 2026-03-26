@@ -1,20 +1,22 @@
 // middleware/petStatus.mjs
 
+/**
+ * Middleware to calculate pet status decay based on time passed since last interaction.
+ */
 const calculateDecay = (req, res, next) => {
     console.log("Middleware trigger: Calculating pet decay...");
     
-    // Simulerer at siste interaksjon var for 1 time siden
+    // Simulating that the last interaction was 1 hour ago for calculation purposes
     const lastInteraction = Date.now() - (1000 * 60 * 60); 
     const hoursPassed = (Date.now() - lastInteraction) / (1000 * 60 * 60);
     
-    // Legger beregnede verdier til request-objektet
+    // Attach calculated decay values to the request object for use in route handlers
     req.decayStats = {
-        hungerIncrease: Math.floor(hoursPassed * 10), // 10 sultpoeng per time
-        energyLoss: Math.floor(hoursPassed * 5)
+        hungerIncrease: Math.floor(hoursPassed * 10), // 10 hunger points per hour
+        energyLoss: Math.floor(hoursPassed * 5)       // 5 energy points per hour
     };
 
-    next(); // Gå videre til neste funksjon (API-endepunktet)
+    next(); // Proceed to the next function/route handler
 };
 
-// I .mjs bruker vi export default
 export default calculateDecay;
