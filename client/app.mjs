@@ -4,6 +4,7 @@ const translations = {
     no: {
         fillFields: "Vennligst fyll ut alle felt",
         saveError: "Kunne ikke lagre bruker.",
+        usernameTaken: "Brukernavnet er allerede tatt. Prøv et annet!",
         invalidLogin: "Ugyldig brukernavn eller passord.",
         giftSent: "Energy Booster sendt til ",
         userNotFound: "Bruker ikke funnet."
@@ -11,6 +12,7 @@ const translations = {
     en: {
         fillFields: "Please fill in all fields",
         saveError: "Could not save user.",
+        usernameTaken: "Username is already taken. Try another!",
         invalidLogin: "Invalid username or password.",
         giftSent: "Energy Booster sent to ",
         userNotFound: "User not found."
@@ -82,12 +84,18 @@ class UserManager extends HTMLElement {
             localStorage.setItem('netpet_user', username);
             this.showGameView(username);
         } catch (error) {
-            alert(t.saveError);
+            // Fikser 409-feilen her
+            if (error.message.includes('409')) {
+                alert(t.usernameTaken);
+            } else {
+                alert(t.saveError);
+            }
         }
     }
 
     async showGameView(username) {
         try {
+            // Skjuler elementer fra index.html
             const globalUI = document.querySelectorAll('h1, footer, .front-gif');
             globalUI.forEach(el => el.style.display = 'none');
 
@@ -104,25 +112,19 @@ class UserManager extends HTMLElement {
                 this.updateUI();
             }, 3000);
 
-            const feedBtn = this.shadowRoot.querySelector('#feed-btn');
-            if (feedBtn) {
-                feedBtn.onclick = () => {
-                    if (this.hunger > 0 || this.energy > 0) { // Kan bare mate hvis ikke død
-                        this.hunger = Math.min(100, this.hunger + 20);
-                        this.updateUI("Yummy!");
-                    }
-                };
-            }
+            this.shadowRoot.querySelector('#feed-btn').onclick = () => {
+                if (this.hunger > 0 || this.energy > 0) {
+                    this.hunger = Math.min(100, this.hunger + 20);
+                    this.updateUI("Yummy!");
+                }
+            };
 
-            const sleepBtn = this.shadowRoot.querySelector('#sleep-btn');
-            if (sleepBtn) {
-                sleepBtn.onclick = () => {
-                    if (this.hunger > 0 || this.energy > 0) {
-                        this.energy = Math.min(100, this.energy + 30);
-                        this.updateUI("Zzz...");
-                    }
-                };
-            }
+            this.shadowRoot.querySelector('#sleep-btn').onclick = () => {
+                if (this.hunger > 0 || this.energy > 0) {
+                    this.energy = Math.min(100, this.energy + 30);
+                    this.updateUI("Zzz...");
+                }
+            };
 
             const giftBtn = this.shadowRoot.querySelector('#gift-btn');
             if (giftBtn) {
@@ -138,8 +140,7 @@ class UserManager extends HTMLElement {
                 };
             }
 
-            const logoutBtn = this.shadowRoot.querySelector('#logout-btn');
-            if (logoutBtn) logoutBtn.onclick = () => this.logout();
+            this.shadowRoot.querySelector('#logout-btn').onclick = () => this.logout();
 
             this.updateUI();
         } catch (error) {
@@ -163,19 +164,17 @@ class UserManager extends HTMLElement {
         if (eFill) eFill.style.width = this.energy + "%";
 
         if (pImg) {
-            // 1. Sjekk først om dyret er dødt (0% på begge)
+            // Sjekker GIF-stier basert på din mappestruktur
             if (this.hunger <= 0 && this.energy <= 0) {
-                pImg.src = "/assets/dead.gif";
-                if (sText) sText.innerText = "Status: Oh no! Your pet is dead... 💀";
+                pImg.src = "./assets/dead.gif";
+                if (sText) sText.innerText = "Status: Oh no! 💀";
             } 
-            // 2. Sjekk om den er trist (Under 50% på sult ELLER energi)
             else if (this.hunger < 50 || this.energy < 50) {
-                pImg.src = "/assets/sad.gif";
+                pImg.src = "./assets/sad.gif";
                 if (sText) sText.innerText = "Status: I'm feeling a bit down...";
             } 
-            // 3. Ellers er den glad (Idle)
             else {
-                pImg.src = "/assets/creatureidle.gif";
+                pImg.src = "./assets/creatureidle.gif";
                 if (sText) sText.innerText = `Status: ${msg}`;
             }
         }
