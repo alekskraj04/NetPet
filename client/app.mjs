@@ -34,9 +34,38 @@ class UserManager extends HTMLElement {
     async connectedCallback() {
         const savedUser = localStorage.getItem('netpet_user');
         if (savedUser && savedUser !== "null" && savedUser !== "" && savedUser !== "undefined") {
-            return this.showGameView(savedUser);
+            // Hent lagrede stats for denne spesifikke brukeren
+            const savedHunger = localStorage.getItem(`${savedUser}_hunger`);
+            const savedEnergy = localStorage.getItem(`${savedUser}_energy`);
+            
+            if (savedHunger !== null) this.hunger = Number(savedHunger);
+            if (savedEnergy !== null) this.energy = Number(savedEnergy);
+
+            await this.showGameView(savedUser);
+            this.calculateOfflineProgress(savedUser); 
+            return;
         }
         this.showLoginView();
+    }
+
+    // Regner ut tidsforskjell og trekker fra poeng
+    calculateOfflineProgress(username) {
+        const lastSeen = localStorage.getItem(`${username}_lastSeen`);
+        if (!lastSeen) return;
+
+        const now = Date.now();
+        const secondsPassed = Math.floor((now - Number(lastSeen)) / 1000);
+        
+        // Siden vi trekker fra hvert 3. sekund i spillet:
+        // Hunger: 2 poeng / 3 sek = 0.66 per sek
+        // Energy: 3 poeng / 3 sek = 1.00 per sek
+        const hungerLoss = Math.floor(secondsPassed * (2 / 3));
+        const energyLoss = Math.floor(secondsPassed * 1);
+
+        this.hunger = Math.max(0, this.hunger - hungerLoss);
+        this.energy = Math.max(0, this.energy - energyLoss);
+        
+        this.updateUI();
     }
 
     async showLoginView() {
@@ -108,6 +137,12 @@ class UserManager extends HTMLElement {
             this.gameTick = setInterval(() => {
                 this.hunger = Math.max(0, this.hunger - 2);
                 this.energy = Math.max(0, this.energy - 3); 
+                
+                // Lagre nåværende status og tidspunkt lokalt
+                localStorage.setItem(`${username}_hunger`, this.hunger);
+                localStorage.setItem(`${username}_energy`, this.energy);
+                localStorage.setItem(`${username}_lastSeen`, Date.now());
+                
                 this.updateUI();
             }, 3000);
 
@@ -169,7 +204,6 @@ class UserManager extends HTMLElement {
         if (eFill) eFill.style.width = this.energy + "%";
 
         if (pImg) {
-            // GJØR GIFS STØRRE OG SKARPE
             pImg.style.width = "250px"; 
             pImg.style.height = "auto";
             pImg.style.imageRendering = "pixelated";
