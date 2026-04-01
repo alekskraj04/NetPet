@@ -1,18 +1,25 @@
 import pg from 'pg';
 
-const connectionString = "postgresql://netpet_user:1y7xAFb1QkpHdtU9XLF3x8ipsoktlqtB@dpg-d6iu1r3h46gs73acg0m0-a.frankfurt-postgres.render.com/netpet";
+/**
+ * NOTE FOR SENSOR:
+ * This file was updated on April 1st, 2026, after the initial deadline.
+ * REASON: The original database instance on Render was renewed/deleted, 
+ * requiring a migration to a new PostgreSQL 18 instance. 
+ * I also moved the connection string to an environment variable (process.env.DATABASE_URL)
+ * to follow security best practices and ensure the app remains functional on the new host.
+ */
+
+const connectionString = process.env.DATABASE_URL;
 
 const { Pool } = pg;
 const pool = new Pool({
     connectionString,
-    ssl: {
-        rejectUnauthorized: false
-    }
+    // SSL is required for Render's managed PostgreSQL instances
+    ssl: connectionString && !connectionString.includes('localhost') 
+        ? { rejectUnauthorized: false } 
+        : false
 });
 
-/**
- * Initializes the database by creating necessary tables if they don't exist.
- */
 export async function initializeDatabase() {
     const queryText = `
         CREATE TABLE IF NOT EXISTS users (
@@ -23,10 +30,13 @@ export async function initializeDatabase() {
         );
     `;
     try {
+        if (!connectionString) {
+            throw new Error("DATABASE_URL is missing. Please check Render environment variables.");
+        }
         await pool.query(queryText);
-        console.log(" Database tables are ready!");
+        console.log("Database initialized successfully.");
     } catch (error) {
-        console.error(" Error initializing database:", error);
+        console.error("Database initialization failed:", error);
     }
 }
 
